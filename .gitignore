@@ -82,7 +82,7 @@ celerybeat-schedule
 *.sage.py
 
 # Environments
-dwh.cfg
+.cfg
 .env
 .venv
 env/
