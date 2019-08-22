@@ -9,6 +9,6 @@
         "$['duration']",
         "$['artist_id']",
         "$['artist_longitude']",
-        "$['artist_location']",
+        "$['artist_location']"
     ]
 }
