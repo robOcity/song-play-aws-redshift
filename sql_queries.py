@@ -27,18 +27,19 @@ CREATE TABLE IF NOT EXISTS event_staging (
     artist varchar,
     auth varchar,
     first_name varchar,
-    gender varchar,
+    gender text,
     item_in_session int,
-    last_name varchar,
+    last_name text,
     length numeric,
-    level varchar,
-    location varchar,
-    method varchar,
-    page varchar,
+    level text,
+    location text,
+    method text,
+    page text,
+    user_id text,
     session_id int,
     status int,
     start_time timestamp,
-    user_id int
+    user_agent text
 );
 """
 
@@ -119,15 +120,31 @@ CREATE TABLE IF NOT EXISTS dim_time (
 
 # STAGING TABLES
 
-staging_events_copy = (
-    """
+staging_events_copy =
+f"""
+COPY event_staging FROM '{LOG_DATA}'
+CREDENTIAL 'aws_iam_role={DWH_ROLE_ARN}'
+JSON 's3://dend-util/events_log_jsonpath.json' 
+TIMEFORMAT 'epochmillisecs'
+REGION '{AWS_REGION}';
 """
-).format()
 
-staging_songs_copy = (
-    """
+example_stage_events_query =
 """
-).format()
+COPY event_staging FROM 's3://udacity-dend/log-data/2018/11/2018-11-11-events.json'
+IAM_ROLE 'arn:aws:iam::921412997039:role/dwhRole'
+JSON 's3://dend-util/events_log_jsonpath.json' 
+TIMEFORMAT 'epochmillisecs'
+REGION 'us-west-2';
+"""
+
+staging_songs_copy =
+f"""
+COPY event_staging FROM '{SONG_DATA}'
+credentials 'aws_iam_role={DWH_ROLE_ARN}'
+gzip delelimiter ';' compupdate off region {AWS_REGION};
+"""
+
 
 # FINAL TABLES
 
