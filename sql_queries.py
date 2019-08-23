@@ -156,7 +156,7 @@ MAXERROR 5
 COMPUPDATE ON;;
 """
 
-one_file_stage_events_copy =
+one_file_staging_events_copy =
 """
 COPY songplay_staging FROM 's3://udacity-dend/song-data/A/N/U/TRANUUB128F422A724.json'
 IAM_ROLE 'arn:aws:iam::921412997039:role/dwhRole'
@@ -167,7 +167,7 @@ MAXERROR 5
 COMPUPDATE ON;
 """
 
-all_files_stage_events_copy =
+all_files_staging_events_copy =
 """
 COPY songplay_staging FROM 's3://udacity-dend/song-data/'
 IAM_ROLE 'arn:aws:iam::921412997039:role/dwhRole'
@@ -175,7 +175,7 @@ JSON 's3://dend-util/songplay_log_jsonpath.json'
 TIMEFORMAT 'epochmillisecs'
 REGION 'us-west-2'
 MAXERROR 5
-COMPUPDATE ON;;
+COMPUPDATE ON;
 """
 
 # FINAL TABLES
