@@ -133,7 +133,16 @@ TIMEFORMAT 'epochmillisecs'
 REGION '{AWS_REGION}';
 """
 
-example_stage_events_query =
+all_files_staging_events_copy = 
+"""
+COPY event_staging FROM 's3://udacity-dend/log-data/'
+IAM_ROLE 'arn:aws:iam::921412997039:role/dwhRole'
+JSON 's3://dend-util/events_log_jsonpath.json' 
+TIMEFORMAT 'epochmillisecs'
+REGION 'us-west-2';"""
+
+
+one_file_staging_events_copy =
 """
 COPY event_staging FROM 's3://udacity-dend/log-data/2018/11/2018-11-11-events.json'
 IAM_ROLE 'arn:aws:iam::921412997039:role/dwhRole'
@@ -142,16 +151,18 @@ TIMEFORMAT 'epochmillisecs'
 REGION 'us-west-2';
 """
 
-staging_songs_copy =
-f"""
-COPY event_staging FROM '{SONG_DATA}'
-credentials 'aws_iam_role={DWH_ROLE_ARN}'
-gzip delelimiter ';' compupdate off region {AWS_REGION};
-"""
-
-example_stage_events_query =
+one_file_stage_events_copy =
 """
 COPY songplay_staging FROM 's3://udacity-dend/song-data/A/N/U/TRANUUB128F422A724.json'
+IAM_ROLE 'arn:aws:iam::921412997039:role/dwhRole'
+JSON 's3://dend-util/songplay_log_jsonpath.json' 
+TIMEFORMAT 'epochmillisecs'
+REGION 'us-west-2';
+"""
+
+all_files_stage_events_copy =
+"""
+COPY songplay_staging FROM 's3://udacity-dend/song-data/'
 IAM_ROLE 'arn:aws:iam::921412997039:role/dwhRole'
 JSON 's3://dend-util/songplay_log_jsonpath.json' 
 TIMEFORMAT 'epochmillisecs'
