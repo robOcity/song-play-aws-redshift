@@ -40,22 +40,26 @@ CREATE TABLE IF NOT EXISTS event_staging (
     status int,
     start_time timestamp,
     user_agent text
-);
+)
+diststyle even
+sortkey (user_id);
 """
 
 staging_songs_table_create = """
 CREATE TABLE IF NOT EXISTS songplay_staging (
-    num_songs int,
-    artist_id varchar,
-    latitude numeric,
-    longitude numeric,
-    location varchar,
-    artist_name varchar,
     song_id varchar,
+    num_songs int,
     title varchar,
+    artist_name varchar,
+    latitude numeric,
+    year int,
     duration numeric,
-    year int
-);
+    artist_id varchar,
+    longitude numeric,
+    location varchar
+)
+diststyle even
+sortkey (artist_id, song_id);
 """
 
 songplay_table_create = """
@@ -145,6 +149,14 @@ credentials 'aws_iam_role={DWH_ROLE_ARN}'
 gzip delelimiter ';' compupdate off region {AWS_REGION};
 """
 
+example_stage_events_query =
+"""
+COPY songplay_staging FROM 's3://udacity-dend/song-data/A/N/U/TRANUUB128F422A724.json'
+IAM_ROLE 'arn:aws:iam::921412997039:role/dwhRole'
+JSON 's3://dend-util/songplay_log_jsonpath.json' 
+TIMEFORMAT 'epochmillisecs'
+REGION 'us-west-2';
+"""
 
 # FINAL TABLES
 
