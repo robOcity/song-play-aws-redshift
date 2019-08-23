@@ -39,7 +39,7 @@ REGION 'us-west-2';
 }
 ```
 
-* Create the Redshift table using SQL using revised column names.  
+* Create the Redshift table using SQL using revised column names.  JSON data elements are extracted based on the name given in the jsonpaths file and inserted into the table based on the order they are defined jsonpaths file.  The order of the data elements in the jsonpaths file must match that of the SQL table.  For example, `itemInSession` is inserted into the 5th column of the SQL table.  In the process the name is effectively changed from `itemInSession` to `item_in_session`.  This name translation only occurs because I am using a jsonpaths files that maps the values between representations.  
 
 ```sql
 CREATE TABLE IF NOT EXISTS event_staging (
