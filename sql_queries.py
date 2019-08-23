@@ -49,14 +49,14 @@ staging_songs_table_create = """
 CREATE TABLE IF NOT EXISTS songplay_staging (
     song_id varchar,
     num_songs int,
-    title varchar,
-    artist_name varchar,
+    title varchar(1024),
+    artist_name varchar(1024),
     latitude numeric,
     year int,
     duration numeric,
     artist_id varchar,
     longitude numeric,
-    location varchar
+    location varchar(1024)
 )
 diststyle even
 sortkey (artist_id, song_id);
@@ -130,8 +130,9 @@ COPY event_staging FROM '{LOG_DATA}'
 CREDENTIAL 'aws_iam_role={DWH_ROLE_ARN}'
 JSON 's3://dend-util/events_log_jsonpath.json' 
 TIMEFORMAT 'epochmillisecs'
-REGION '{AWS_REGION}';
-"""
+REGION '{AWS_REGION}'
+MAXERROR 5
+COMPUPDATE ON;"""
 
 all_files_staging_events_copy = 
 """
@@ -139,7 +140,9 @@ COPY event_staging FROM 's3://udacity-dend/log-data/'
 IAM_ROLE 'arn:aws:iam::921412997039:role/dwhRole'
 JSON 's3://dend-util/events_log_jsonpath.json' 
 TIMEFORMAT 'epochmillisecs'
-REGION 'us-west-2';"""
+REGION 'us-west-2'
+MAXERROR 5
+COMPUPDATE ON;"""
 
 
 one_file_staging_events_copy =
@@ -148,7 +151,9 @@ COPY event_staging FROM 's3://udacity-dend/log-data/2018/11/2018-11-11-events.js
 IAM_ROLE 'arn:aws:iam::921412997039:role/dwhRole'
 JSON 's3://dend-util/events_log_jsonpath.json' 
 TIMEFORMAT 'epochmillisecs'
-REGION 'us-west-2';
+REGION 'us-west-2'
+MAXERROR 5
+COMPUPDATE ON;;
 """
 
 one_file_stage_events_copy =
@@ -157,7 +162,9 @@ COPY songplay_staging FROM 's3://udacity-dend/song-data/A/N/U/TRANUUB128F422A724
 IAM_ROLE 'arn:aws:iam::921412997039:role/dwhRole'
 JSON 's3://dend-util/songplay_log_jsonpath.json' 
 TIMEFORMAT 'epochmillisecs'
-REGION 'us-west-2';
+REGION 'us-west-2'
+MAXERROR 5
+COMPUPDATE ON;
 """
 
 all_files_stage_events_copy =
@@ -166,7 +173,9 @@ COPY songplay_staging FROM 's3://udacity-dend/song-data/'
 IAM_ROLE 'arn:aws:iam::921412997039:role/dwhRole'
 JSON 's3://dend-util/songplay_log_jsonpath.json' 
 TIMEFORMAT 'epochmillisecs'
-REGION 'us-west-2';
+REGION 'us-west-2'
+MAXERROR 5
+COMPUPDATE ON;;
 """
 
 # FINAL TABLES
