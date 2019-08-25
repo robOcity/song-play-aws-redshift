@@ -73,7 +73,9 @@ CREATE TABLE IF NOT EXISTS fact_songplay (
     level varchar NOT NULL, 
     location varchar, 
     user_agent varchar,
-    PRIMARY KEY (songplay_id));
+    PRIMARY KEY (songplay_id))
+diststyle even
+sortkey (artist_id, song_id);
 """
 
 user_table_create = """
@@ -84,7 +86,9 @@ CREATE TABLE IF NOT EXISTS dim_user (
     gender varchar, 
     level varchar,
     PRIMARY KEY (user_id, level)
-);
+)
+diststyle all
+sortkey (user_id);
 """
 
 song_table_create = """
@@ -95,7 +99,9 @@ CREATE TABLE IF NOT EXISTS dim_song (
     year int, 
     duration numeric CHECK (duration > 0),
     PRIMARY KEY (song_id)
-);
+)
+diststyle all
+sortkey (song_id);
 """
 
 artist_table_create = """
@@ -106,7 +112,9 @@ CREATE TABLE IF NOT EXISTS dim_artist (
     latitude numeric, 
     longitude numeric,
     PRIMARY KEY (artist_id)
-);
+)
+diststyle all
+sortkey (artist_id);
 """
 
 time_table_create = """
@@ -119,7 +127,8 @@ CREATE TABLE IF NOT EXISTS dim_time (
     year int, 
     weekday varchar,
     PRIMARY KEY (start_time)
-);
+)diststyle even
+sortkey (start_time);
 """
 
 # STAGING TABLES
@@ -156,7 +165,7 @@ MAXERROR 5
 COMPUPDATE ON;;
 """
 
-one_file_staging_events_copy =
+one_songplay_events_copy =
 """
 COPY songplay_staging FROM 's3://udacity-dend/song-data/A/N/U/TRANUUB128F422A724.json'
 IAM_ROLE 'arn:aws:iam::921412997039:role/dwhRole'
@@ -167,7 +176,7 @@ MAXERROR 5
 COMPUPDATE ON;
 """
 
-all_files_staging_events_copy =
+all_songplay_events_copy =
 """
 COPY songplay_staging FROM 's3://udacity-dend/song-data/'
 IAM_ROLE 'arn:aws:iam::921412997039:role/dwhRole'
