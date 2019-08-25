@@ -41,8 +41,8 @@ CREATE TABLE IF NOT EXISTS event_staging (
     start_time timestamp,
     user_agent text
 )
-diststyle even
-sortkey (user_id);
+DISTSTYLE even
+SORTKEY (user_id);
 """
 
 staging_songs_table_create = """
@@ -58,8 +58,8 @@ CREATE TABLE IF NOT EXISTS songplay_staging (
     longitude numeric,
     location varchar(1024)
 )
-diststyle even
-sortkey (artist_id, song_id);
+DISTSTYLE even
+SORTKEY (artist_id, song_id);
 """
 
 songplay_table_create = """
@@ -74,8 +74,8 @@ CREATE TABLE IF NOT EXISTS fact_songplay (
     location varchar, 
     user_agent varchar,
     PRIMARY KEY (songplay_id))
-diststyle even
-sortkey (artist_id, song_id);
+DISTSTYLE even
+SORTKEY (artist_id, song_id);
 """
 
 user_table_create = """
@@ -87,8 +87,8 @@ CREATE TABLE IF NOT EXISTS dim_user (
     level varchar,
     PRIMARY KEY (user_id, level)
 )
-diststyle all
-sortkey (user_id);
+DISTSTYLE all
+SORTKEY (user_id);
 """
 
 song_table_create = """
@@ -100,8 +100,8 @@ CREATE TABLE IF NOT EXISTS dim_song (
     duration numeric CHECK (duration > 0),
     PRIMARY KEY (song_id)
 )
-diststyle all
-sortkey (song_id);
+DISTSTYLE all
+SORTKEY (song_id);
 """
 
 artist_table_create = """
@@ -113,8 +113,8 @@ CREATE TABLE IF NOT EXISTS dim_artist (
     longitude numeric,
     PRIMARY KEY (artist_id)
 )
-diststyle all
-sortkey (artist_id);
+DISTSTYLE all
+SORTKEY (artist_id);
 """
 
 time_table_create = """
@@ -127,8 +127,8 @@ CREATE TABLE IF NOT EXISTS dim_time (
     year int, 
     weekday varchar,
     PRIMARY KEY (start_time)
-)diststyle even
-sortkey (start_time);
+)DISTSTYLE even
+SORTKEY (start_time);
 """
 
 # STAGING TABLES
