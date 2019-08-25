@@ -140,8 +140,7 @@ CREDENTIAL 'aws_iam_role={DWH_ROLE_ARN}'
 JSON 's3://dend-util/events_log_jsonpath.json' 
 TIMEFORMAT 'epochmillisecs'
 REGION '{AWS_REGION}'
-MAXERROR 5
-COMPUPDATE ON;"""
+MAXERROR 5;"""
 
 all_files_staging_events_copy = 
 """
@@ -150,8 +149,7 @@ IAM_ROLE 'arn:aws:iam::921412997039:role/dwhRole'
 JSON 's3://dend-util/events_log_jsonpath.json' 
 TIMEFORMAT 'epochmillisecs'
 REGION 'us-west-2'
-MAXERROR 5
-COMPUPDATE ON;"""
+MAXERROR 5;"""
 
 
 one_file_staging_events_copy =
@@ -161,8 +159,7 @@ IAM_ROLE 'arn:aws:iam::921412997039:role/dwhRole'
 JSON 's3://dend-util/events_log_jsonpath.json' 
 TIMEFORMAT 'epochmillisecs'
 REGION 'us-west-2'
-MAXERROR 5
-COMPUPDATE ON;;
+MAXERROR 5;
 """
 
 one_songplay_events_copy =
@@ -172,8 +169,7 @@ IAM_ROLE 'arn:aws:iam::921412997039:role/dwhRole'
 JSON 's3://dend-util/songplay_log_jsonpath.json' 
 TIMEFORMAT 'epochmillisecs'
 REGION 'us-west-2'
-MAXERROR 5
-COMPUPDATE ON;
+MAXERROR 5;
 """
 
 all_songplay_events_copy =
@@ -183,8 +179,7 @@ IAM_ROLE 'arn:aws:iam::921412997039:role/dwhRole'
 JSON 's3://dend-util/songplay_log_jsonpath.json' 
 TIMEFORMAT 'epochmillisecs'
 REGION 'us-west-2'
-MAXERROR 5
-COMPUPDATE ON;
+MAXERROR 5;
 """
 
 # FINAL TABLES
