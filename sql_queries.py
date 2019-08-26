@@ -235,15 +235,16 @@ INSERT INTO dim_time (
 songplay_table_insert = """
 INSERT INTO fact_songplay (user_id, song_id, artist_id, session_id, start_time, level, location, user_agent) 
     SELECT es.user_id, saj.song_id, saj.artist_id, es.session_id, es.start_time, es.level, es.location, es.user_agent
-    FROM event_staging as es
+    FROM event_staging_2 as es
     JOIN (
-        SELECT ds.song_id, da.artist_id, da.name, ds.duration
+        SELECT ds.song_id, ds.title, ds.duration, da.artist_id, da.name 
         FROM dim_song AS ds
-        JOIN ON ds.artist_id = da.artist_id) AS saj
-    AND (se.song = ds.title
-    AND se.artist = saj.name
-    AND se.length = saj.duration)
-    WHERE se.page = 'NextSong');
+        JOIN dim_artist AS da
+      	ON ds.artist_id = da.artist_id) AS saj
+    ON (es.song = saj.title
+    AND es.artist = saj.name
+    AND es.length = saj.duration)
+    WHERE es.page = 'NextSong';
 """
 
 # QUERY LISTS
