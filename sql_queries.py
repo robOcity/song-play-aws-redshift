@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS dim_song (
     title varchar NOT NULL, 
     artist_id varchar NOT NULL, 
     year int, 
-    duration numeric CHECK (duration > 0),
+    duration numeric,
     PRIMARY KEY (song_id)
 )
 DISTSTYLE all
