@@ -20,7 +20,7 @@ song_table_drop = "DROP TABLE IF EXISTS song;"
 artist_table_drop = "DROP TABLE IF EXISTS artist;"
 time_table_drop = "DROP TABLE IF EXISTS time;"
 
-# CREATE TABLES
+# CREATE STAGING TABLES
 
 staging_events_table_create = """
 CREATE TABLE IF NOT EXISTS event_staging (
@@ -61,6 +61,8 @@ CREATE TABLE IF NOT EXISTS songplay_staging (
 DISTSTYLE even
 SORTKEY (artist_id, song_id);
 """
+
+# CREATE FACT AND DIMENSION TABLES
 
 songplay_table_create = """
 CREATE TABLE IF NOT EXISTS fact_songplay (
