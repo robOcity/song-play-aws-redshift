@@ -49,14 +49,14 @@ staging_songs_table_create = """
 CREATE TABLE IF NOT EXISTS songplay_staging (
     song_id varchar,
     num_songs int,
-    title varchar(1024),
-    artist_name varchar(1024),
+    title varchar,
+    artist_name varchar,
     latitude numeric,
     year int,
     duration numeric,
     artist_id varchar,
     longitude numeric,
-    location varchar(1024)
+    location varchar
 )
 DISTSTYLE even
 SORTKEY (artist_id, song_id);
@@ -219,15 +219,22 @@ ON CONFLICT DO NOTHING;
 
 time_table_insert = """
 INSERT INTO dim_time (
-    start_time, 
-    hour, 
-    day, 
-    week, 
-    month, 
-    year, 
-    weekday) 
-VALUES (%s, %s, %s, %s, %s, %s, %s)
-ON CONFLICT DO NOTHING;
+  start_time, 
+  hour, 
+  day, 
+  week, 
+  month, 
+  year, 
+  weekday)
+  SELECT 
+  	es.start_time, 
+    extract(hour from es.start_time) as hour,
+    extract(day from es.start_time) as day,
+    extract(week from es.start_time) as week,
+    extract(month from es.start_time) as month,
+    extract(year from es.start_time) as year,
+    extract(dayofweek from es.start_time) as weekday
+  FROM event_staging AS es;
 """
 
 songplay_table_insert = """
