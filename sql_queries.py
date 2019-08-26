@@ -67,11 +67,10 @@ SORTKEY (song_id);
 # CREATE FACT AND DIMENSION TABLES
 
 songplay_table_create = """
-CREATE TABLE IF NOT EXISTS fact_songplay (
-    songplay_id int NOT NULL, 
+CREATE TABLE IF NOT EXISTS fact_songplay ( 
     user_id text NOT NULL, 
-    song_id varchar, 
-    artist_id varchar, 
+    song_id varchar NOT NULL, 
+    artist_id varchar NOT NULL, 
     session_id int NOT NULL, 
     start_time timestamp NOT NULL, 
     level varchar NOT NULL, 
