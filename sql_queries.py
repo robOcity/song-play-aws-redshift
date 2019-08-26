@@ -207,14 +207,9 @@ INSERT INTO dim_song (song_id, title, artist_id, year, duration)
 """
 
 artist_table_insert = """
-INSERT INTO dim_artist (
-    artist_id, 
-    name, 
-    location, 
-    latitude, 
-    longitude) 
-VALUES (%s, %s, %s, %s, %s)
-ON CONFLICT DO NOTHING;
+INSERT INTO dim_artist (artist_id, name, location, latitude, longitude) 
+    SELECT DISTINCT sps.artist_id, sps.artist_name, sps.location, sps.longitude, sps.latitude
+    FROM songplay_staging_2 AS sps;
 """
 
 time_table_insert = """
