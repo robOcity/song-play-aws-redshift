@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS fact_songplay (
     start_time timestamp NOT NULL, 
     level varchar NOT NULL, 
     location varchar, 
-    user_agent varchar,
+    user_agent varchar)
 DISTSTYLE even
 SORTKEY (artist_id, song_id);
 """
