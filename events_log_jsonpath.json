@@ -13,8 +13,10 @@
         "$['page']",
         "$['registration']",
         "$['sessionId']",
+        "$['song']",
         "$['status']",
         "$['ts']",
-        "$['userAgent']"
+        "$['userAgent']",
+        "$['userId']"
     ]
 }
