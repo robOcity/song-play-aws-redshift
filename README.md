@@ -63,6 +63,15 @@ CREATE TABLE IF NOT EXISTS event_staging (
 DISTSTYLE even
 SORTKEY (start_time);
 ```
+* Listing the tables in the database using SQL since PSQL in not an option of Redshift
+
+```
+SELECT table_schema,table_name
+FROM information_schema.tables
+WHERE table_schema = 'public'
+ORDER BY table_schema,table_name;
+```
+
 
 ## AWS Command Line Notes
 
