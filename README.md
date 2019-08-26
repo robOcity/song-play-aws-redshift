@@ -78,3 +78,9 @@ ORDER BY table_schema,table_name;
 * List all files in S3 bucket: `aws s3 ls s3://udacity-dend/log-data --recursive`
 
 * Display S3 text file: `aws s3 cp --quiet  s3://udacity-dend/song-data/G/A/W/TRGAWQH128F4222C36.json /dev/stdout`
+
+* Debugging redshift errors
+
+```select process, errcode, linenum as line, trim(error) as err
+from pg_catalog.stl_error
+where errcode = '8001';```
