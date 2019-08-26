@@ -76,7 +76,6 @@ CREATE TABLE IF NOT EXISTS fact_songplay (
     level varchar NOT NULL, 
     location varchar, 
     user_agent varchar,
-    PRIMARY KEY (songplay_id))
 DISTSTYLE even
 SORTKEY (artist_id, song_id);
 """
