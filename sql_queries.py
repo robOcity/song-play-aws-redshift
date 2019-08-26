@@ -64,7 +64,7 @@ SORTKEY (artist_id, song_id);
 
 songplay_table_create = """
 CREATE TABLE IF NOT EXISTS fact_songplay (
-    songplay_id SERIAL, 
+    songplay_id int NOT NULL, 
     user_id int NOT NULL, 
     song_id varchar, 
     artist_id varchar, 
@@ -80,7 +80,7 @@ SORTKEY (artist_id, song_id);
 
 user_table_create = """
 CREATE TABLE IF NOT EXISTS dim_user (
-    user_id int, 
+    user_id int NOT NULL, 
     first_name varchar, 
     last_name varchar, 
     gender varchar, 
@@ -93,7 +93,7 @@ SORTKEY (user_id);
 
 song_table_create = """
 CREATE TABLE IF NOT EXISTS dim_song (
-    song_id varchar, 
+    song_id varchar NOT NULL, 
     title varchar NOT NULL, 
     artist_id varchar NOT NULL, 
     year int, 
@@ -106,7 +106,7 @@ SORTKEY (song_id);
 
 artist_table_create = """
 CREATE TABLE IF NOT EXISTS dim_artist (
-    artist_id varchar, 
+    artist_id varchar NOT NULL, 
     name varchar NOT NULL, 
     location varchar, 
     latitude numeric, 
@@ -119,7 +119,7 @@ SORTKEY (artist_id);
 
 time_table_create = """
 CREATE TABLE IF NOT EXISTS dim_time (
-    start_time timestamp, 
+    start_time timestamp NOT NULL, 
     hour int, 
     day int, 
     week int, 
