@@ -67,7 +67,7 @@ SORTKEY (artist_id, song_id);
 songplay_table_create = """
 CREATE TABLE IF NOT EXISTS fact_songplay (
     songplay_id int NOT NULL, 
-    user_id int NOT NULL, 
+    user_id text NOT NULL, 
     song_id varchar, 
     artist_id varchar, 
     session_id int NOT NULL, 
@@ -82,7 +82,7 @@ SORTKEY (artist_id, song_id);
 
 user_table_create = """
 CREATE TABLE IF NOT EXISTS dim_user (
-    user_id int NOT NULL, 
+    user_id text NOT NULL, 
     first_name varchar, 
     last_name varchar, 
     gender varchar, 
@@ -184,33 +184,13 @@ REGION 'us-west-2'
 MAXERROR 5;
 """
 
-# FINAL TABLES
-
-songplay_table_insert = """
-INSERT INTO fact_songplay (
-    user_id, 
-    song_id, 
-    artist_id, 
-    session_id, 
-    start_time,
-    level, 
-    location, 
-    user_agent) 
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s);
-"""
+# INSERT DATA FROM STAGING TO FACT & DIMENSION TABLES
 
 user_table_insert = """
-INSERT INTO dim_user (
-    user_id, 
-    first_name, 
-    last_name, 
-    gender, 
-    level) 
-VALUES (%s, %s, %s, %s, %s)
-ON CONFLICT (user_id, level) 
-DO
-    UPDATE
-    SET level = EXCLUDED.level;
+INSERT INTO dim_user (user_id, first_name, last_name, gender, level) 
+    SELECT DISTINCT es.user_id, es.first_name, es.last_name, es.gender, es.level
+    FROM event_staging AS es
+    WHERE se.page = 'NextSong';
 """
 
 song_table_insert = """INSERT INTO dim_song (
@@ -245,6 +225,19 @@ INSERT INTO dim_time (
     weekday) 
 VALUES (%s, %s, %s, %s, %s, %s, %s)
 ON CONFLICT DO NOTHING;
+"""
+
+songplay_table_insert = """
+INSERT INTO fact_songplay (
+    user_id, 
+    song_id, 
+    artist_id, 
+    session_id, 
+    start_time,
+    level, 
+    location, 
+    user_agent) 
+VALUES (%s, %s, %s, %s, %s, %s, %s, %s);
 """
 
 # QUERY LISTS
