@@ -139,49 +139,56 @@ staging_events_copy =
 f"""
 COPY event_staging FROM '{LOG_DATA}'
 CREDENTIAL 'aws_iam_role={DWH_ROLE_ARN}'
-JSON 's3://dend-util/events_log_jsonpath.json' 
+JSON 's3://dend-util/events_log_jsonpath.json' truncatecolumns
 TIMEFORMAT 'epochmillisecs'
 REGION '{AWS_REGION}'
-MAXERROR 5;"""
+COMPUPDATE off
+MAXERROR 3;
+"""
 
 all_files_staging_events_copy = 
 """
 COPY event_staging FROM 's3://udacity-dend/log-data/'
 IAM_ROLE 'arn:aws:iam::921412997039:role/dwhRole'
-JSON 's3://dend-util/events_log_jsonpath.json' 
+JSON 's3://dend-util/events_log_jsonpath.json' truncatecolumns
 TIMEFORMAT 'epochmillisecs'
 REGION 'us-west-2'
-MAXERROR 5;"""
+COMPUPDATE off
+MAXERROR 3;
+"""
 
 
 one_file_staging_events_copy =
 """
 COPY event_staging FROM 's3://udacity-dend/log-data/2018/11/2018-11-11-events.json'
 IAM_ROLE 'arn:aws:iam::921412997039:role/dwhRole'
-JSON 's3://dend-util/events_log_jsonpath.json' 
+JSON 's3://dend-util/events_log_jsonpath.json' truncatecolumns
 TIMEFORMAT 'epochmillisecs'
 REGION 'us-west-2'
-MAXERROR 5;
+COMPUPDATE off
+MAXERROR 3;
 """
 
 one_songplay_events_copy =
 """
 COPY songplay_staging FROM 's3://udacity-dend/song-data/A/N/U/TRANUUB128F422A724.json'
 IAM_ROLE 'arn:aws:iam::921412997039:role/dwhRole'
-JSON 's3://dend-util/songplay_log_jsonpath.json' 
+JSON 's3://dend-util/songplay_log_jsonpath.json' truncatecolumns
 TIMEFORMAT 'epochmillisecs'
 REGION 'us-west-2'
-MAXERROR 5;
+COMPUPDATE off
+MAXERROR 3;
 """
 
 all_songplay_events_copy =
 """
 COPY songplay_staging FROM 's3://udacity-dend/song-data/'
 IAM_ROLE 'arn:aws:iam::921412997039:role/dwhRole'
-JSON 's3://dend-util/songplay_log_jsonpath.json' 
+JSON 's3://dend-util/songplay_log_jsonpath.json' truncatecolumns
 TIMEFORMAT 'epochmillisecs'
 REGION 'us-west-2'
-MAXERROR 5;
+COMPUPDATE off
+MAXERROR 3;
 """
 
 # INSERT DATA FROM STAGING TO FACT & DIMENSION TABLES
@@ -193,14 +200,10 @@ INSERT INTO dim_user (user_id, first_name, last_name, gender, level)
     WHERE se.page = 'NextSong';
 """
 
-song_table_insert = """INSERT INTO dim_song (
-    song_id, 
-    title, 
-    artist_id, 
-    year, 
-    duration) 
-VALUES (%s, %s, %s, %s, %s)
-ON CONFLICT DO NOTHING;
+song_table_insert = """
+INSERT INTO dim_song (song_id, title, artist_id, year, duration) 
+    SELECT DISTINCT sps.song_id, sps.title, sps.artist_id, sps.year, sps.duration
+    FROM songplay_staging AS sps;
 """
 
 artist_table_insert = """
