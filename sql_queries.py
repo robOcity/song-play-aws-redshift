@@ -43,8 +43,8 @@ CREATE TABLE IF NOT EXISTS event_staging (
     user_agent varchar,
     user_id varchar
 )
-DISTSTYLE even
-SORTKEY (user_id);
+DISTSTYLE all
+SORTKEY (start_time);
 """
 
 staging_songs_table_create = """
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS songplay_staging (
     location varchar
 )
 DISTSTYLE even
-SORTKEY (artist_id, song_id);
+SORTKEY (song_id);
 """
 
 # CREATE FACT AND DIMENSION TABLES
