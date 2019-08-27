@@ -136,30 +136,28 @@ SORTKEY (start_time);
 
 # STAGING TABLES
 
-staging_events_copy =
-f"""
-COPY event_staging FROM '{LOG_DATA}'
-CREDENTIAL 'aws_iam_role={DWH_ROLE_ARN}'
+staging_events_copy = f"""
+COPY event_staging FROM '{config.get('S3', 'LOG_DATA')}'
+CREDENTIAL 'aws_iam_role={config.get('IAM_ROLE', 'DWH_ROLE_ARN')}'
 JSON 's3://dend-util/events_log_jsonpath.json' truncatecolumns
 TIMEFORMAT 'epochmillisecs'
-REGION '{AWS_REGION}'
+REGION '{config.get('CLUSTER', 'AWS_REGION')}'
 COMPUPDATE off
 MAXERROR 3;
 """
 
-staging_songs_copy =
-f"""
-COPY songplay_staging FROM '{SONG_DATA}'
-IAM_ROLE '{DWH_ROLE_ARN}'
+staging_songs_copy = f"""
+COPY songplay_staging FROM '{config.get('S3', 'SONG_DATA')}'
+IAM_ROLE '{config.get('IAM_ROLE', 'DWH_ROLE_ARN')}'
 JSON 's3://dend-util/songplay_log_jsonpath.json' truncatecolumns
 TIMEFORMAT 'epochmillisecs'
-REGION '{AWS_REGION}'
+REGION '{config.get('CLUSTER', 'AWS_REGION')}'
 COMPUPDATE off
 MAXERROR 3;
 """
 
-#TODO cleanup
-# all_files_staging_events_copy = 
+# TODO cleanup
+# all_files_staging_events_copy =
 # """
 # COPY event_staging FROM 's3://udacity-dend/log-data/'
 # IAM_ROLE 'arn:aws:iam::921412997039:role/dwhRole'
