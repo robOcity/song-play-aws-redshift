@@ -14,11 +14,11 @@ config.read("dwh.cfg")
 
 staging_events_table_drop = "DROP TABLE IF EXISTS event_staging;"
 staging_songs_table_drop = "DROP TABLE IF EXISTS songplay_staging;"
-songplay_table_drop = "DROP TABLE IF EXISTS songplay;"
-user_table_drop = "DROP TABLE IF EXISTS user;"
-song_table_drop = "DROP TABLE IF EXISTS song;"
-artist_table_drop = "DROP TABLE IF EXISTS artist;"
-time_table_drop = "DROP TABLE IF EXISTS time;"
+songplay_table_drop = "DROP TABLE IF EXISTS fact_songplay;"
+user_table_drop = "DROP TABLE IF EXISTS dim_user;"
+song_table_drop = "DROP TABLE IF EXISTS dim_song;"
+artist_table_drop = "DROP TABLE IF EXISTS dim_artist;"
+time_table_drop = "DROP TABLE IF EXISTS dim_time;"
 
 # CREATE STAGING TABLES
 
@@ -155,29 +155,6 @@ REGION '{config.get('CLUSTER', 'AWS_REGION')}'
 COMPUPDATE off
 MAXERROR 3;
 """
-
-# TODO cleanup
-# all_files_staging_events_copy =
-# """
-# COPY event_staging FROM 's3://udacity-dend/log-data/'
-# IAM_ROLE 'arn:aws:iam::921412997039:role/dwhRole'
-# JSON 's3://dend-util/events_log_jsonpath.json' truncatecolumns
-# TIMEFORMAT 'epochmillisecs'
-# REGION 'us-west-2'
-# COMPUPDATE off
-# MAXERROR 3;
-# """
-
-# all_songplay_events_copy =
-# """
-# COPY songplay_staging FROM 's3://udacity-dend/song-data/'
-# IAM_ROLE 'arn:aws:iam::921412997039:role/dwhRole'
-# JSON 's3://dend-util/songplay_log_jsonpath.json' truncatecolumns
-# TIMEFORMAT 'epochmillisecs'
-# REGION 'us-west-2'
-# COMPUPDATE off
-# MAXERROR 3;
-# """
 
 # INSERT DATA FROM STAGING TO FACT & DIMENSION TABLES
 
