@@ -197,7 +197,7 @@ user_table_insert = """
 INSERT INTO dim_user (user_id, first_name, last_name, gender, level) 
     SELECT DISTINCT es.user_id, es.first_name, es.last_name, es.gender, es.level
     FROM event_staging AS es
-    WHERE se.page = 'NextSong';
+    WHERE es.page = 'NextSong';
 """
 
 song_table_insert = """
@@ -209,7 +209,7 @@ INSERT INTO dim_song (song_id, title, artist_id, year, duration)
 artist_table_insert = """
 INSERT INTO dim_artist (artist_id, name, location, latitude, longitude) 
     SELECT DISTINCT sps.artist_id, sps.artist_name, sps.location, sps.longitude, sps.latitude
-    FROM songplay_staging_2 AS sps;
+    FROM songplay_staging AS sps;
 """
 
 time_table_insert = """
@@ -235,7 +235,7 @@ INSERT INTO dim_time (
 songplay_table_insert = """
 INSERT INTO fact_songplay (user_id, song_id, artist_id, session_id, start_time, level, location, user_agent) 
     SELECT es.user_id, saj.song_id, saj.artist_id, es.session_id, es.start_time, es.level, es.location, es.user_agent
-    FROM event_staging_2 as es
+    FROM event_staging as es
     JOIN (
         SELECT ds.song_id, ds.title, ds.duration, da.artist_id, da.name 
         FROM dim_song AS ds
