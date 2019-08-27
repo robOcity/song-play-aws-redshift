@@ -127,7 +127,8 @@ CREATE TABLE IF NOT EXISTS dim_time (
     week int, 
     month int, 
     year int, 
-    weekday varchar,
+    weekday int,
+    weekday_str varchar(3),
     PRIMARY KEY (start_time)
 )DISTSTYLE even
 SORTKEY (start_time);
@@ -220,7 +221,8 @@ INSERT INTO dim_time (
   week, 
   month, 
   year, 
-  weekday)
+  weekday,
+  weekday_str)
   SELECT 
   	es.start_time, 
     extract(hour from es.start_time) as hour,
@@ -228,7 +230,8 @@ INSERT INTO dim_time (
     extract(week from es.start_time) as week,
     extract(month from es.start_time) as month,
     extract(year from es.start_time) as year,
-    extract(dayofweek from es.start_time) as weekday
+    extract(dayofweek from es.start_time) as weekday,
+    to_char(es.start_time, 'Dy') as weekday_str
   FROM event_staging AS es;
 """
 
@@ -246,6 +249,22 @@ INSERT INTO fact_songplay (user_id, song_id, artist_id, session_id, start_time, 
     AND es.length = saj.duration)
     WHERE es.page = 'NextSong';
 """
+
+# ANALYTIC QUERIES
+
+songplay_by_weekday = """
+SELECT dt.weekday_str as Weekday, count(*) as Count
+FROM fact_songplay fs
+JOIN dim_time_2   dt ON (dt.start_time  = fs.start_time)
+GROUP BY dt.weekday, dt.weekday_str
+ORDER BY dt.weekday;"""
+
+users_by_gender = """
+SELECT distinct du.gender, count(distinct(du.user_id)) 
+FROM fact_songplay fs
+JOIN dim_user du ON (du.user_id = fs.user_id)
+GROUP BY du.gender;"""
+
 
 # QUERY LISTS
 
