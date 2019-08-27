@@ -15,11 +15,12 @@ def create_tables(cur, conn):
         conn.commit()
 
 def main():
-    config = configparser.ConfigParser()
-    config.read("dwh.cfg")
+
+    config = configparser.ConfigParser(interpolation=None)
+    config.read("dwh.cfg", encoding='utf-8')
 
     connect_str = "host={} dbname={} user={} password={} port={}".format(*config["CLUSTER"].values())
-
+    print(connect_str)
     conn = psycopg2.connect(connect_str)
 
     cur = conn.cursor()
