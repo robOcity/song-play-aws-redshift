@@ -259,14 +259,11 @@ JOIN dim_time_2   dt ON (dt.start_time  = fs.start_time)
 GROUP BY dt.weekday, dt.weekday_str
 ORDER BY dt.weekday;"""
 
-users_by_gender = """
-SELECT du.gender, count(distinct(du.user_id)) 
+users_by_gender_and_level = """
+SELECT du.gender, fs.level, count(distinct(du.user_id))
 FROM fact_songplay fs
 JOIN dim_user du ON (du.user_id = fs.user_id)
-GROUP BY du.gender;"""
-
-
-
+GROUP BY du.gender, fs.level;"""
 
 # QUERY LISTS
 
