@@ -260,10 +260,12 @@ GROUP BY dt.weekday, dt.weekday_str
 ORDER BY dt.weekday;"""
 
 users_by_gender = """
-SELECT distinct du.gender, count(distinct(du.user_id)) 
+SELECT du.gender, count(distinct(du.user_id)) 
 FROM fact_songplay fs
 JOIN dim_user du ON (du.user_id = fs.user_id)
 GROUP BY du.gender;"""
+
+
 
 
 # QUERY LISTS
