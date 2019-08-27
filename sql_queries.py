@@ -147,50 +147,39 @@ COMPUPDATE off
 MAXERROR 3;
 """
 
-all_files_staging_events_copy = 
-"""
-COPY event_staging FROM 's3://udacity-dend/log-data/'
-IAM_ROLE 'arn:aws:iam::921412997039:role/dwhRole'
-JSON 's3://dend-util/events_log_jsonpath.json' truncatecolumns
-TIMEFORMAT 'epochmillisecs'
-REGION 'us-west-2'
-COMPUPDATE off
-MAXERROR 3;
-"""
-
-
-one_file_staging_events_copy =
-"""
-COPY event_staging FROM 's3://udacity-dend/log-data/2018/11/2018-11-11-events.json'
-IAM_ROLE 'arn:aws:iam::921412997039:role/dwhRole'
-JSON 's3://dend-util/events_log_jsonpath.json' truncatecolumns
-TIMEFORMAT 'epochmillisecs'
-REGION 'us-west-2'
-COMPUPDATE off
-MAXERROR 3;
-"""
-
-one_songplay_events_copy =
-"""
-COPY songplay_staging FROM 's3://udacity-dend/song-data/A/N/U/TRANUUB128F422A724.json'
-IAM_ROLE 'arn:aws:iam::921412997039:role/dwhRole'
+staging_songs_copy =
+f"""
+COPY songplay_staging FROM '{SONG_DATA}'
+IAM_ROLE '{DWH_ROLE_ARN}'
 JSON 's3://dend-util/songplay_log_jsonpath.json' truncatecolumns
 TIMEFORMAT 'epochmillisecs'
-REGION 'us-west-2'
+REGION '{AWS_REGION}'
 COMPUPDATE off
 MAXERROR 3;
 """
 
-all_songplay_events_copy =
-"""
-COPY songplay_staging FROM 's3://udacity-dend/song-data/'
-IAM_ROLE 'arn:aws:iam::921412997039:role/dwhRole'
-JSON 's3://dend-util/songplay_log_jsonpath.json' truncatecolumns
-TIMEFORMAT 'epochmillisecs'
-REGION 'us-west-2'
-COMPUPDATE off
-MAXERROR 3;
-"""
+#TODO cleanup
+# all_files_staging_events_copy = 
+# """
+# COPY event_staging FROM 's3://udacity-dend/log-data/'
+# IAM_ROLE 'arn:aws:iam::921412997039:role/dwhRole'
+# JSON 's3://dend-util/events_log_jsonpath.json' truncatecolumns
+# TIMEFORMAT 'epochmillisecs'
+# REGION 'us-west-2'
+# COMPUPDATE off
+# MAXERROR 3;
+# """
+
+# all_songplay_events_copy =
+# """
+# COPY songplay_staging FROM 's3://udacity-dend/song-data/'
+# IAM_ROLE 'arn:aws:iam::921412997039:role/dwhRole'
+# JSON 's3://dend-util/songplay_log_jsonpath.json' truncatecolumns
+# TIMEFORMAT 'epochmillisecs'
+# REGION 'us-west-2'
+# COMPUPDATE off
+# MAXERROR 3;
+# """
 
 # INSERT DATA FROM STAGING TO FACT & DIMENSION TABLES
 
