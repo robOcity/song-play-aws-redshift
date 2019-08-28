@@ -1,8 +1,7 @@
-import configparser
 import psycopg2
 import boto3
 from sql_queries import create_table_queries, drop_table_queries
-from utils import open_tcp_connection
+from utils import open_tcp_connection, build_connection_str
 
 
 def drop_tables(cur, conn):
@@ -16,19 +15,9 @@ def create_tables(cur, conn):
         conn.commit()
 
 def main():
-
-    config = configparser.ConfigParser(interpolation=None)
-    config.read("dwh.cfg", encoding='utf-8')
-    DB_USER = config.get('CLUSTER', 'DB_USER')
-    DB_PASSWORD = config.get('CLUSTER', 'DB_PASSWORD')
-    DB_ENDPOINT = config.get('CLUSTER', 'DB_ENDPOINT')
-    DB_PORT = config.get('CLUSTER', 'DB_PORT')
-    DB_NAME = config.get('CLUSTER', 'DB_NAME')
-
-    connect_str="postgresql://{}:{}@{}:{}/{}".format(DB_USER, DB_PASSWORD, DB_ENDPOINT, DB_PORT, DB_NAME)
-    print(connect_str)
-    conn = psycopg2.connect(connect_str)
-
+    connection_str = build_connection_str()
+    print(connection_str)
+    conn = psycopg2.connect(connection_str)
     cur = conn.cursor()
 
     drop_tables(cur, conn)
