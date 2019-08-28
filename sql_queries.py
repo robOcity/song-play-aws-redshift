@@ -189,23 +189,23 @@ INSERT INTO dim_time (
   weekday_str)
   SELECT 
   	es.start_time, 
-    extract(hour from es.start_time) as hour,
-    extract(day from es.start_time) as day,
-    extract(week from es.start_time) as week,
-    extract(month from es.start_time) as month,
-    extract(year from es.start_time) as year,
-    extract(dayofweek from es.start_time) as weekday,
-    to_char(es.start_time, 'Dy') as weekday_str
+    extract(hour from es.start_time)      AS hour,
+    extract(day from es.start_time)       AS day,
+    extract(week from es.start_time)      AS week,
+    extract(month from es.start_time)     AS month,
+    extract(year from es.start_time)      AS year,
+    extract(dayofweek from es.start_time) AS weekday,
+    to_char(es.start_time, 'Dy')          AS weekday_str
   FROM event_staging AS es;
 """
 
 songplay_table_insert = """
 INSERT INTO fact_songplay (user_id, song_id, artist_id, session_id, start_time, level, location, user_agent) 
     SELECT es.user_id, saj.song_id, saj.artist_id, es.session_id, es.start_time, es.level, es.location, es.user_agent
-    FROM event_staging as es
+    FROM event_staging AS es
     JOIN (
         SELECT ds.song_id, ds.title, ds.duration, da.artist_id, da.name 
-        FROM dim_song AS ds
+        FROM dim_song   AS ds
         JOIN dim_artist AS da
       	ON ds.artist_id = da.artist_id) AS saj
     ON (es.song = saj.title
@@ -216,7 +216,7 @@ INSERT INTO fact_songplay (user_id, song_id, artist_id, session_id, start_time, 
 
 # ANALYTIC QUERIES
 
-count_rows_in_star """
+count_rows_in_star = """
 SELECT count(*) 
 FROM fact_songplay fs
 JOIN dim_song   ds ON (ds.song_id = fs.song_id)
@@ -225,7 +225,7 @@ JOIN dim_artist da ON (da.artist_id = fs.artist_id)
 JOIN dim_time   dt ON (dt.start_time = fs.start_time);"""
 
 songplay_by_weekday = """
-SELECT dt.weekday_str as Weekday, count(*) as Count
+SELECT dt.weekday_str AS Weekday, count(*) AS Count
 FROM fact_songplay fs
 JOIN dim_time      dt ON (dt.start_time  = fs.start_time)
 GROUP BY dt.weekday, dt.weekday_str
