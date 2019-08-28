@@ -216,10 +216,18 @@ INSERT INTO fact_songplay (user_id, song_id, artist_id, session_id, start_time, 
 
 # ANALYTIC QUERIES
 
+count_rows_in_star """
+SELECT count(*) 
+FROM fact_songplay fs
+JOIN dim_song   ds ON (ds.song_id = fs.song_id)
+JOIN dim_user   du ON (du.user_id = fs.user_id)
+JOIN dim_artist da ON (da.artist_id = fs.artist_id)
+JOIN dim_time   dt ON (dt.start_time = fs.start_time);"""
+
 songplay_by_weekday = """
 SELECT dt.weekday_str as Weekday, count(*) as Count
 FROM fact_songplay fs
-JOIN dim_time_2   dt ON (dt.start_time  = fs.start_time)
+JOIN dim_time      dt ON (dt.start_time  = fs.start_time)
 GROUP BY dt.weekday, dt.weekday_str
 ORDER BY dt.weekday;"""
 
