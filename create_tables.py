@@ -2,24 +2,8 @@ import configparser
 import psycopg2
 import boto3
 from sql_queries import create_table_queries, drop_table_queries
+from utils import open_tcp_connection
 
-def open_tcp_connection():
-    try:
-        vpc = ec2.Vpc(id=myClusterProps['VpcId'])
-        defaultSg = list(vpc.security_groups.all())[0]
-        print(type(defaultSg))
-        
-        defaultSg.authorize_ingress(
-            GroupName='redshift_security_group', 
-            CidrIp='0.0.0.0/0',
-            IpProtocol='TCP',
-            FromPort=int(DWH_PORT),
-            ToPort=int(DWH_PORT)
-        )
-       
-    except Exception as e:
-        print(e)
-        raise e
 
 def drop_tables(cur, conn):
     for query in drop_table_queries:
