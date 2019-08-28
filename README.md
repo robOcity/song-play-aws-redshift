@@ -63,6 +63,17 @@ CREATE TABLE IF NOT EXISTS event_staging (
 DISTSTYLE even
 SORTKEY (start_time);
 ```
+
+* Joining the fact and dimension tables
+
+```
+select count(*)
+from fact_songplay fs
+join dim_song ds on (ds.song_id = fs.song_id)
+join dim_user du on (du.user_id = fs.user_id)
+join dim_artist da on (da.artist_id = fs.artist_id)
+join dim_time dt on (dt.start_time = fs.start_time);```
+
 * Listing the tables in the database using SQL since PSQL in not an option of Redshift
 
 ```
