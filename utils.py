@@ -1,4 +1,5 @@
 import configparser
+import psycopg2
 
 def open_tcp_connection():
     try:
@@ -31,3 +32,10 @@ def build_connection_str(cfg_file="dwh.cfg"):
     DB_NAME = config.get('CLUSTER', 'DB_NAME')
 
     return "postgresql://{}:{}@{}:{}/{}".format(DB_USER, DB_PASSWORD, DB_ENDPOINT, DB_PORT, DB_NAME)
+
+def connect():
+    connection_str = build_connection_str()
+    print(f'\nConnecting: {connection_str}')
+    conn = psycopg2.connect(connection_str)
+    cur = conn.cursor()
+    return cur, conn
