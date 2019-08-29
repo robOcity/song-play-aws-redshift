@@ -90,6 +90,10 @@ ORDER BY table_schema,table_name;
 
 * Display S3 text file: `aws s3 cp --quiet  s3://udacity-dend/song-data/G/A/W/TRGAWQH128F4222C36.json /dev/stdout`
 
+* Debugging copy errors when loading data into staging tables
+
+```select * from pg_catalog.stl_load_errors limit 5;```
+
 * Debugging redshift errors
 
 ```select process, errcode, linenum as line, trim(error) as err
