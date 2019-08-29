@@ -217,13 +217,29 @@ INSERT INTO fact_songplay (user_id, song_id, artist_id, session_id, start_time, 
 
 # ANALYTIC QUERIES
 
-count_rows_in_star = """
-SELECT count(*) 
+top_10_artists = """
+SELECT da.name as artist, count(ds.title) as num_plays
 FROM fact_songplay fs
 JOIN dim_song   ds ON (ds.song_id = fs.song_id)
 JOIN dim_user   du ON (du.user_id = fs.user_id)
 JOIN dim_artist da ON (da.artist_id = fs.artist_id)
-JOIN dim_time   dt ON (dt.start_time = fs.start_time);"""
+JOIN dim_time   dt ON (dt.start_time = fs.start_time)
+GROUP BY da.name
+ORDER BY num_plays DESC
+LIMIT 10;
+"""
+
+top_10_songs = """
+SELECT da.name, ds.title, count(ds.title) as num_plays
+FROM fact_songplay fs
+JOIN dim_song   ds ON (ds.song_id = fs.song_id)
+JOIN dim_user   du ON (du.user_id = fs.user_id)
+JOIN dim_artist da ON (da.artist_id = fs.artist_id)
+JOIN dim_time   dt ON (dt.start_time = fs.start_time)
+GROUP BY da.name, ds.title
+ORDER BY num_plays DESC
+LIMIT 10;
+"""
 
 songplay_by_weekday = """
 SELECT dt.weekday_str AS Weekday, count(*) AS Count
@@ -232,11 +248,23 @@ JOIN dim_time      dt ON (dt.start_time  = fs.start_time)
 GROUP BY dt.weekday, dt.weekday_str
 ORDER BY dt.weekday;"""
 
+
 users_by_gender_and_level = """
 SELECT du.gender, fs.level, count(distinct(du.user_id))
 FROM fact_songplay fs
 JOIN dim_user du ON (du.user_id = fs.user_id)
 GROUP BY du.gender, fs.level;"""
+
+
+# DIAGNOSTIC QUERY
+
+count_rows_in_star = """
+SELECT count(*)
+FROM fact_songplay fs
+JOIN dim_song   ds ON (ds.song_id = fs.song_id)
+JOIN dim_user   du ON (du.user_id = fs.user_id)
+JOIN dim_artist da ON (da.artist_id = fs.artist_id)
+JOIN dim_time   dt ON (dt.start_time = fs.start_time);"""
 
 # QUERY LISTS
 
