@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS fact_songplay (
     location varchar,
     user_agent varchar)
 DISTSTYLE even
-SORTKEY (artist_id, song_id);
+SORTKEY (song_id);
 """
 
 user_table_create = """
@@ -260,9 +260,9 @@ drop_table_queries = [
 ]
 copy_table_queries = [staging_events_copy, staging_songs_copy]
 insert_table_queries = [
-    songplay_table_insert,
     user_table_insert,
     song_table_insert,
     artist_table_insert,
     time_table_insert,
+    songplay_table_insert
 ]
