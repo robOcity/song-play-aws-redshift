@@ -138,7 +138,7 @@ SORTKEY (start_time);
 
 staging_events_copy = f"""
 COPY event_staging FROM '{config.get('S3', 'LOG_DATA')}'
-CREDENTIAL 'aws_iam_role={config.get('IAM_ROLE', 'DWH_ROLE_ARN')}'
+IAM_ROLE '{config.get('IAM_ROLE', 'DWH_ROLE_ARN')}'
 JSON 's3://dend-util/events_log_jsonpath.json' truncatecolumns
 TIMEFORMAT 'epochmillisecs'
 REGION '{config.get('CLUSTER', 'AWS_REGION')}'
