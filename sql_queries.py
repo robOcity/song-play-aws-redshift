@@ -1,5 +1,5 @@
 """
-SQL statements to create tables, insert data into them and 
+SQL statements to create tables, insert data into them and
 drop them from the database.
 """
 
@@ -7,6 +7,7 @@ import configparser
 
 
 # CONFIG
+
 config = configparser.ConfigParser()
 config.read("dwh.cfg")
 
@@ -67,14 +68,14 @@ SORTKEY (song_id);
 # CREATE FACT AND DIMENSION TABLES
 
 songplay_table_create = """
-CREATE TABLE IF NOT EXISTS fact_songplay ( 
-    user_id text NOT NULL, 
-    song_id varchar NOT NULL, 
-    artist_id varchar NOT NULL, 
-    session_id int NOT NULL, 
-    start_time timestamp NOT NULL, 
-    level varchar NOT NULL, 
-    location varchar, 
+CREATE TABLE IF NOT EXISTS fact_songplay (
+    user_id text NOT NULL,
+    song_id varchar NOT NULL,
+    artist_id varchar NOT NULL,
+    session_id int NOT NULL,
+    start_time timestamp NOT NULL,
+    level varchar NOT NULL,
+    location varchar,
     user_agent varchar)
 DISTSTYLE even
 SORTKEY (artist_id, song_id);
@@ -82,10 +83,10 @@ SORTKEY (artist_id, song_id);
 
 user_table_create = """
 CREATE TABLE IF NOT EXISTS dim_user (
-    user_id text NOT NULL, 
-    first_name varchar, 
-    last_name varchar, 
-    gender varchar, 
+    user_id text NOT NULL,
+    first_name varchar,
+    last_name varchar,
+    gender varchar,
     level varchar,
     PRIMARY KEY (user_id, level)
 )
@@ -95,10 +96,10 @@ SORTKEY (user_id);
 
 song_table_create = """
 CREATE TABLE IF NOT EXISTS dim_song (
-    song_id varchar NOT NULL, 
-    title varchar NOT NULL, 
-    artist_id varchar NOT NULL, 
-    year int, 
+    song_id varchar NOT NULL,
+    title varchar NOT NULL,
+    artist_id varchar NOT NULL,
+    year int,
     duration numeric,
     PRIMARY KEY (song_id)
 )
@@ -108,10 +109,10 @@ SORTKEY (song_id);
 
 artist_table_create = """
 CREATE TABLE IF NOT EXISTS dim_artist (
-    artist_id varchar NOT NULL, 
-    name varchar NOT NULL, 
-    location varchar, 
-    latitude numeric, 
+    artist_id varchar NOT NULL,
+    name varchar NOT NULL,
+    location varchar,
+    latitude numeric,
     longitude numeric,
     PRIMARY KEY (artist_id)
 )
@@ -121,12 +122,12 @@ SORTKEY (artist_id);
 
 time_table_create = """
 CREATE TABLE IF NOT EXISTS dim_time (
-    start_time timestamp NOT NULL, 
-    hour int, 
-    day int, 
-    week int, 
-    month int, 
-    year int, 
+    start_time timestamp NOT NULL,
+    hour int,
+    day int,
+    week int,
+    month int,
+    year int,
     weekday int,
     weekday_str varchar(3),
     PRIMARY KEY (start_time)
@@ -159,44 +160,44 @@ MAXERROR 3;
 # INSERT DATA FROM STAGING TO FACT & DIMENSION TABLES
 
 user_table_insert = """
-INSERT INTO dim_user (user_id, first_name, last_name, gender, level) 
+INSERT INTO dim_user (user_id, first_name, last_name, gender, level)
     SELECT DISTINCT es.user_id, es.first_name, es.last_name, es.gender, es.level
     FROM event_staging AS es
     WHERE es.page = 'NextSong';
 """
 
 song_table_insert = """
-INSERT INTO dim_song (song_id, title, artist_id, year, duration) 
+INSERT INTO dim_song (song_id, title, artist_id, year, duration)
     SELECT DISTINCT sps.song_id, sps.title, sps.artist_id, sps.year, sps.duration
     FROM songplay_staging AS sps;
 """
 
 artist_table_insert = """
-INSERT INTO dim_artist (artist_id, name, location, latitude, longitude) 
+INSERT INTO dim_artist (artist_id, name, location, latitude, longitude)
     SELECT DISTINCT sps.artist_id, sps.artist_name, sps.location, sps.longitude, sps.latitude
     FROM songplay_staging AS sps;
 """
 
 time_table_insert = """
 INSERT INTO dim_time (
-  start_time, 
-  hour, 
-  day, 
-  week, 
-  month, 
-  year, 
-  weekday,
-  weekday_str)
-  SELECT 
-  	es.start_time, 
-    extract(hour from es.start_time)      AS hour,
-    extract(day from es.start_time)       AS day,
-    extract(week from es.start_time)      AS week,
-    extract(month from es.start_time)     AS month,
-    extract(year from es.start_time)      AS year,
-    extract(dayofweek from es.start_time) AS weekday,
-    to_char(es.start_time, 'Dy')          AS weekday_str
-  FROM event_staging AS es;
+    start_time,
+    hour,
+    day,
+    week,
+    month,
+    year,
+    weekday,
+    weekday_str)
+    SELECT
+        es.start_time,
+        extract(hour from es.start_time)      AS hour,
+        extract(day from es.start_time)       AS day,
+        extract(week from es.start_time)      AS week,
+        extract(month from es.start_time)     AS month,
+        extract(year from es.start_time)      AS year,
+        extract(dayofweek from es.start_time) AS weekday,
+        to_char(es.start_time, 'Dy')          AS weekday_str
+    FROM event_staging AS es;
 """
 
 songplay_table_insert = """
@@ -204,7 +205,7 @@ INSERT INTO fact_songplay (user_id, song_id, artist_id, session_id, start_time, 
     SELECT es.user_id, saj.song_id, saj.artist_id, es.session_id, es.start_time, es.level, es.location, es.user_agent
     FROM event_staging AS es
     JOIN (
-        SELECT ds.song_id, ds.title, ds.duration, da.artist_id, da.name 
+        SELECT ds.song_id, ds.title, ds.duration, da.artist_id, da.name
         FROM dim_song   AS ds
         JOIN dim_artist AS da
       	ON ds.artist_id = da.artist_id) AS saj
