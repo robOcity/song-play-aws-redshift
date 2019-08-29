@@ -24,27 +24,25 @@ def get_command():
     return cmd
 
 
-
 def main():
 
-    while True:
-        cmd = get_command()
-        if cmd == 'Q':
-            # exit the app
-            break
-        elif cmd == 'L':
-            # load data
-            print('\nLoading data (~20 minutes)')
-            cur, conn = connect()
-            load_staging_tables(cur, conn)
+    cmd = get_command()
+    if cmd == 'Q':
+        # exit the app
+        break
+    elif cmd == 'L':
+        # load data
+        print('\nLoading data (~20 minutes)')
+        cur, conn = connect()
+        load_staging_tables(cur, conn)
 
-        elif cmd == 'I':
-            # insert data 
-            print('\nInserting data (~2 minutes)')
-            cur, conn = connect()
-            insert_tables(cur, conn)
+    elif cmd == 'I':
+        # insert data 
+        print('\nInserting data (~2 minutes)')
+        cur, conn = connect()
+        insert_tables(cur, conn)
 
-        conn.close()
+    conn.close()
 
 
 if __name__ == "__main__":
