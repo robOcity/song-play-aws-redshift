@@ -1,5 +1,22 @@
 # AWS Redshift Data Warehouse
 
+How can you build a simple data pipeline on AWS to support your analytical users?  In this repository, I will show how using AWS S# for storage, AWS Redshift to perform ETL and Python to orcestrate it.  First, the data are extracted from JSON log files stored on S3 the SQL using Redshift's `copy` command that creates the staging tables.  Next, SQL `insert` statements transform the data.  Finally, I show you how to use the star-schema for analysis.  
+
+## Files
+
+1. `create_tables.py` - Uses `sql_queries.py` and `utils.py` to drop (delete) and create all tables.  After running this module the database is ready for data to be imported.
+ 
+1. `sql_queries.py` - Creates, inserts and drops all staging and star schema tables.  Show how to analyzes the data in the star-schema.  
+
+1. `utils.py` - Creates connections to a running AWS Redshift instance.  Uses data stored in `dwh.cfg`.
+
+1. `events_log_jsonpath.json` - Maps data elements from the events log file into the events_staging table.  More broadly, the jsonpaths file allows any hierarchical JSON data to be mapped into a flat SQL table.  The field names are from the JSON file.  Ordering determines which column they are insterted into the table.  The JSON field listed in the first row in the jsonpaths file is inserted into the first column of the SQL table.
+
+1. `songplay_log_jsonpath.json` - Maps user's song play activity into the songplay_staging table.  Plays the same role as is described above for the events log data.  
+
+## Running
+
+
 ## Loading data on AWS Redshift -- A JSON example
 
 Load data from S3 using Redshift's `copy` command of JSON data.  Let me point out a couple of arguments that I found particularly important.
