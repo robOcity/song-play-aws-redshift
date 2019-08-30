@@ -1,6 +1,8 @@
 # AWS Redshift Data Warehouse
 
-How can you build a simple data pipeline on AWS to support your analytical users?  In this repository, I will show how using [AWS S3](https://docs.aws.amazon.com/AmazonS3/latest/dev/Introduction.html) for storage, [AWS Redshift](https://docs.aws.amazon.com/redshift/latest/mgmt/welcome.html) to perform ETL and Python to orcestrate it.  First, the data are extracted from JSON log files stored on S3 the SQL using Redshift's `copy` command that creates the staging tables.  Next, SQL `insert` statements transform the data.  Finally, I show you how to use the star-schema for analysis.  
+How can you build a simple data pipeline on AWS to support your analytical users?  In this repository, I will show how using [AWS S3](https://docs.aws.amazon.com/AmazonS3/latest/dev/Introduction.html) for storage, [AWS Redshift](https://docs.aws.amazon.com/redshift/latest/mgmt/welcome.html) to perform ETL and Python to orcestrate it.  First, the data are extracted from JSON log files stored on S3 the SQL using Redshift's `copy` command that creates the staging tables.  Next, SQL `insert` statements transform the data.  Finally, I show you how to use the star-schema for analysis. 
+
+![Architecture](images/etl_aws_s3_to_redshift-qs.png)
 
 ## Files
 
@@ -183,15 +185,6 @@ INSERT INTO fact_songplay (user_id, song_id, artist_id, session_id, start_time, 
 
 ## Performing analysis
 
-Let's find out which songs are most popular by subscriber's gender and whether they have paid or free account.  
-
-```sql
-SELECT du.gender, fs.level, count(distinct(du.user_id))
-FROM fact_songplay fs
-JOIN dim_user du ON (du.user_id = fs.user_id)
-GROUP BY du.gender, fs.level;
-```
-
 Across the service, who are the top-10 artists?
 
 ```sql
@@ -202,6 +195,17 @@ JOIN dim_artist da ON (da.artist_id = fs.artist_id)
 GROUP BY da.name
 ORDER BY num_plays DESC
 LIMIT 10;
+```
+
+Here are the results of this query using the AWS Redshift Query Tool. ![AWS Redshift Query Tool](images/top-10-artists.png)
+
+Let's find out which songs are most popular by subscriber's gender and whether they have paid or free account. 
+
+```sql
+SELECT du.gender, fs.level, count(distinct(du.user_id))
+FROM fact_songplay fs
+JOIN dim_user du ON (du.user_id = fs.user_id)
+GROUP BY du.gender, fs.level;
 ```
 
 How does user activity vary by weekday?
