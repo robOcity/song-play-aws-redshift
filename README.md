@@ -1,6 +1,6 @@
 # AWS Redshift Data Warehouse
 
-How can you build a simple data pipeline on AWS to support your analytical users?  In this repository, I will show how using AWS S# for storage, AWS Redshift to perform ETL and Python to orcestrate it.  First, the data are extracted from JSON log files stored on S3 the SQL using Redshift's `copy` command that creates the staging tables.  Next, SQL `insert` statements transform the data.  Finally, I show you how to use the star-schema for analysis.  
+How can you build a simple data pipeline on AWS to support your analytical users?  In this repository, I will show how using [AWS S3](https://docs.aws.amazon.com/AmazonS3/latest/dev/Introduction.html) for storage, [AWS Redshift](https://docs.aws.amazon.com/redshift/latest/mgmt/welcome.html) to perform ETL and Python to orcestrate it.  First, the data are extracted from JSON log files stored on S3 the SQL using Redshift's `copy` command that creates the staging tables.  Next, SQL `insert` statements transform the data.  Finally, I show you how to use the star-schema for analysis.  
 
 ## Files
 
@@ -15,6 +15,41 @@ How can you build a simple data pipeline on AWS to support your analytical users
 1. `songplay_log_jsonpath.json` - Maps user's song play activity into the songplay_staging table.  Plays the same role as is described above for the events log data.  
 
 ## Running
+
+1. Assumptions:  You have a S3 bucket with data you want to parse and Redshift cluster up and running.  Plus, you have `dwh.cfg` file containing the following fields:
+
+```
+[CLUSTER]
+DB_ENDPOINT=an-endpoint-address-available-on-the-cluster-status-page
+DB_NAME=your-db-name
+DB_USER=your-db-user
+DB_PASSWORD=your-db-users-pw
+DB_PORT=5439
+CLUSTER_TYPE=multi-node
+NUM_NODES=4
+NODE_TYPE=dc2.large
+AWS_REGION=same-region-as-your-s3-data
+CLUSTER_ID=your-clusters-name
+
+[IAM_ROLE]
+ROLE=an-iam-role-with-redshift-full-access-ands3-read-only-access
+DWH_ROLE_ARN=the-arn-of-this-role
+
+[S3]
+LOG_DATA=s3://udacity-dend/log-data
+LOG_JSONPATH=s3://udacity-dend/log_json_path.json
+SONG_DATA=s3://udacity-dend/song-data
+```
+
+Okay, this step was a heavy lift, especially the first time!
+
+1. Run `python create_tables.py` dropping (deleting) all your exiting tables and re-creating them.  These commands run quickly.
+
+1. Run `python etl.py1` and type `L` to extract the data from the log files and insert them into the staging tables.  _This command took me more than 1 hour to run with four dc2.large nodes in my cluster._  The bulk of that time is spent copying the songplay data logs.
+
+1. Run `python etl.py` and type `I` to transform and load the data from the staging tables into the star-schema tables.  This command only took only a few minutes to run on my cluster.
+
+1. Run analytics queries using the Redshift console or [other means](https://docs.aws.amazon.com/redshift/latest/mgmt/connecting-using-workbench.html).
 
 
 ## Loading data on AWS Redshift -- A JSON example
