@@ -16,6 +16,12 @@ How can you build a simple data pipeline on AWS to support your analytical users
 
 1. `songplay_log_jsonpath.json` - Maps user's song play activity into the songplay_staging table.  Plays the same role as is described above for the events log data.  
 
+## Table Design
+
+Staging tables support data ingest from online transaction processing systems (OLTP).  Here data are extracted from JSON files and inserted into the staging tables using the `copy` command provided by AWS Redshift.  More on that later.  Star-schemas are great for supporting analytic workflows utilized by online analytic processing systems (OLAP).  
+
+![ER Diagram](images/song_play_er_diagram.png)
+
 ## Running
 
 1. Assumptions:  You have a S3 bucket with data you want to parse and Redshift cluster up and running.  Plus, you have `dwh.cfg` file containing the following fields:
