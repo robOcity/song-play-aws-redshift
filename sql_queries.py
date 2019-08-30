@@ -72,11 +72,7 @@ CREATE TABLE IF NOT EXISTS fact_songplay (
     user_id text NOT NULL,
     song_id varchar NOT NULL,
     artist_id varchar NOT NULL,
-    session_id int NOT NULL,
-    start_time timestamp NOT NULL,
-    level varchar NOT NULL,
-    location varchar,
-    user_agent varchar)
+    start_time timestamp NOT NULL
 DISTSTYLE even
 SORTKEY (song_id);
 """
@@ -201,8 +197,8 @@ INSERT INTO dim_time (
 """
 
 songplay_table_insert = """
-INSERT INTO fact_songplay (user_id, song_id, artist_id, session_id, start_time, level, location, user_agent) 
-    SELECT es.user_id, saj.song_id, saj.artist_id, es.session_id, es.start_time, es.level, es.location, es.user_agent
+INSERT INTO fact_songplay (user_id, song_id, artist_id, session_id, start_time) 
+    SELECT es.user_id, saj.song_id, saj.artist_id, es.session_id, es.start_time
     FROM event_staging AS es
     JOIN (
         SELECT ds.song_id, ds.title, ds.duration, da.artist_id, da.name
@@ -221,9 +217,7 @@ top_10_artists = """
 SELECT da.name as artist, count(ds.title) as num_plays
 FROM fact_songplay fs
 JOIN dim_song   ds ON (ds.song_id = fs.song_id)
-JOIN dim_user   du ON (du.user_id = fs.user_id)
 JOIN dim_artist da ON (da.artist_id = fs.artist_id)
-JOIN dim_time   dt ON (dt.start_time = fs.start_time)
 GROUP BY da.name
 ORDER BY num_plays DESC
 LIMIT 10;
@@ -233,9 +227,7 @@ top_10_songs = """
 SELECT da.name, ds.title, count(ds.title) as num_plays
 FROM fact_songplay fs
 JOIN dim_song   ds ON (ds.song_id = fs.song_id)
-JOIN dim_user   du ON (du.user_id = fs.user_id)
 JOIN dim_artist da ON (da.artist_id = fs.artist_id)
-JOIN dim_time   dt ON (dt.start_time = fs.start_time)
 GROUP BY da.name, ds.title
 ORDER BY num_plays DESC
 LIMIT 10;
@@ -292,5 +284,5 @@ insert_table_queries = [
     song_table_insert,
     artist_table_insert,
     time_table_insert,
-    songplay_table_insert
+    songplay_table_insert,
 ]
