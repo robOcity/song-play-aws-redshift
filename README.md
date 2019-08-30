@@ -137,7 +137,8 @@ Let's find out which songs are most popular by subscriber's gender and whether t
 SELECT du.gender, fs.level, count(distinct(du.user_id))
 FROM fact_songplay fs
 JOIN dim_user du ON (du.user_id = fs.user_id)
-GROUP BY du.gender, fs.level;```
+GROUP BY du.gender, fs.level;
+```
 
 Across the service, who are the top-10 artists?
 
@@ -148,7 +149,8 @@ JOIN dim_song   ds ON (ds.song_id = fs.song_id)
 JOIN dim_artist da ON (da.artist_id = fs.artist_id)
 GROUP BY da.name
 ORDER BY num_plays DESC
-LIMIT 10;```
+LIMIT 10;
+```
 
 How does user activity vary by weekday?
 
@@ -163,6 +165,7 @@ ORDER BY dt.weekday;
 ## Useful AWS commands and queries
 
 * Listing the tables in the database using SQL since PSQL in not an option of Redshift.  
+
 ```sql
 SELECT table_schema,table_name
 FROM information_schema.tables
