@@ -1,31 +1,37 @@
+"""Establish connections to AWS Redshift"""
+
 import configparser
 import psycopg2
 
 
 def get_config():
+    """Returns a ConfigParser object 
+    allowing programmatic access to configuration parameters"""
+
     return configparser.ConfigParser(interpolation=None)
 
 
 def build_connection_str(cfg_file="dwh.cfg"):
+    """Returns the formatted PostgreSQL connection string"""
+
     config = get_config()
-    config.read(cfg_file, encoding='utf-8')
-    DB_USER = config.get('CLUSTER', 'DB_USER')
-    DB_PASSWORD = config.get('CLUSTER', 'DB_PASSWORD')
-    DB_ENDPOINT = config.get('CLUSTER', 'DB_ENDPOINT')
-    DB_PORT = config.get('CLUSTER', 'DB_PORT')
-    DB_NAME = config.get('CLUSTER', 'DB_NAME')
+    config.read(cfg_file, encoding="utf-8")
+    DB_USER = config.get("CLUSTER", "DB_USER")
+    DB_PASSWORD = config.get("CLUSTER", "DB_PASSWORD")
+    DB_ENDPOINT = config.get("CLUSTER", "DB_ENDPOINT")
+    DB_PORT = config.get("CLUSTER", "DB_PORT")
+    DB_NAME = config.get("CLUSTER", "DB_NAME")
 
     return "postgresql://{}:{}@{}:{}/{}".format(
-        DB_USER,
-        DB_PASSWORD,
-        DB_ENDPOINT,
-        DB_PORT,
-        DB_NAME)
+        DB_USER, DB_PASSWORD, DB_ENDPOINT, DB_PORT, DB_NAME
+    )
 
 
 def connect():
+    """Connects to Redshift cluster using parameter values from configuration file"""
+
     connection_str = build_connection_str()
-    print(f'\nConnecting: {connection_str}')
+    print(f"\nConnecting: {connection_str}")
     conn = psycopg2.connect(connection_str)
     cur = conn.cursor()
     return cur, conn
