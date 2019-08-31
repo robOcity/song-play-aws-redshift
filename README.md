@@ -20,6 +20,15 @@ How can you build a simple data pipeline on AWS to support your analytical users
 
 Staging tables support data ingest from online transaction processing systems (OLTP).  Here data are extracted from JSON files and inserted into the staging tables using the `copy` command provided by AWS Redshift.  More on that later.  Star-schemas are great for supporting analytic workflows utilized by online analytic processing systems (OLAP).  
 
+Derived from the code of the open source PostgreSQL project, Redshift distributes tables allowing for it to operate on the parallel in parallel.  The distribution style (diststyle  or distkey) can be configured as:
+
+* even - spreading data evenly among nodes
+* all - an entire copy of the table on every node
+* auto - optimized by Redshift
+* key - stores data with common key values on a node
+
+Additionally, a sortkey can be provided too that orders the data on each node according the key assigned.  In Redshift, primary and foreign keys are treated as suggestions to the query processing runtime. 
+
 ![ER Diagram](images/song_play_er_diagram.png)
 
 ## Running
