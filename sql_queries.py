@@ -42,9 +42,10 @@ CREATE TABLE IF NOT EXISTS event_staging (
     status int,
     start_time timestamp,
     user_agent varchar,
-    user_id varchar
+    user_id varchar,
+    PRIMARY KEY (start_time)
 )
-DISTSTYLE all
+DISTSTYLE even
 SORTKEY (start_time);
 """
 
@@ -59,7 +60,8 @@ CREATE TABLE IF NOT EXISTS songplay_staging (
     duration numeric,
     artist_id varchar,
     longitude numeric,
-    location varchar
+    location varchar,
+    PRIMARY KEY (song_id)
 )
 DISTSTYLE even
 SORTKEY (song_id);
@@ -69,22 +71,26 @@ SORTKEY (song_id);
 
 songplay_table_create = """
 CREATE TABLE IF NOT EXISTS fact_songplay (
-    user_id text NOT NULL,
-    song_id varchar NOT NULL,
-    artist_id varchar NOT NULL,
-    start_time timestamp NOT NULL
+    user_id text,
+    song_id varchar,
+    artist_id varchar,
+    start_time timestamp,
+    FOREIGN KEY (user_id) REFERENCES dim_user(user_id),
+    FOREIGN KEY (song_id) REFERENCES dim_song(song_id),
+    FOREIGN KEY (artist_id) REFERENCES dim_artist(artist_id),
+    FOREIGN KEY (start_time) REFERENCES dim_time(start_time),
 DISTSTYLE even
 SORTKEY (song_id);
 """
 
 user_table_create = """
 CREATE TABLE IF NOT EXISTS dim_user (
-    user_id text NOT NULL,
+    user_id text,
     first_name varchar,
     last_name varchar,
     gender varchar,
     level varchar,
-    PRIMARY KEY (user_id, level)
+    PRIMARY KEY (user_id)
 )
 DISTSTYLE all
 SORTKEY (user_id);
@@ -92,7 +98,7 @@ SORTKEY (user_id);
 
 song_table_create = """
 CREATE TABLE IF NOT EXISTS dim_song (
-    song_id varchar NOT NULL,
+    song_id varchar,
     title varchar NOT NULL,
     artist_id varchar NOT NULL,
     year int,
@@ -105,7 +111,7 @@ SORTKEY (song_id);
 
 artist_table_create = """
 CREATE TABLE IF NOT EXISTS dim_artist (
-    artist_id varchar NOT NULL,
+    artist_id varchar,
     name varchar NOT NULL,
     location varchar,
     latitude numeric,
@@ -118,7 +124,7 @@ SORTKEY (artist_id);
 
 time_table_create = """
 CREATE TABLE IF NOT EXISTS dim_time (
-    start_time timestamp NOT NULL,
+    start_time timestamp,
     hour int,
     day int,
     week int,
