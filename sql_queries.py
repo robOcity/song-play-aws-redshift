@@ -6,12 +6,12 @@ drop them from the database.
 import configparser
 
 
-# CONFIG
+# CONFIG ---------------------------------------------------------------------
 
 config = configparser.ConfigParser()
 config.read("dwh.cfg")
 
-# DROP TABLES
+# DROP TABLES ----------------------------------------------------------------
 
 staging_events_table_drop = "DROP TABLE IF EXISTS event_staging;"
 staging_songs_table_drop = "DROP TABLE IF EXISTS songplay_staging;"
@@ -21,7 +21,7 @@ song_table_drop = "DROP TABLE IF EXISTS dim_song;"
 artist_table_drop = "DROP TABLE IF EXISTS dim_artist;"
 time_table_drop = "DROP TABLE IF EXISTS dim_time;"
 
-# CREATE STAGING TABLES
+# CREATE STAGING TABLES ------------------------------------------------------
 
 staging_events_table_create = """
 CREATE TABLE IF NOT EXISTS event_staging (
@@ -65,7 +65,7 @@ DISTSTYLE even
 SORTKEY (song_id);
 """
 
-# CREATE FACT AND DIMENSION TABLES
+# CREATE FACT AND DIMENSION TABLES -------------------------------------------
 
 songplay_table_create = """
 CREATE TABLE IF NOT EXISTS fact_songplay (
@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS dim_time (
 SORTKEY (start_time);
 """
 
-# STAGING TABLES
+# STAGING TABLES -------------------------------------------------------------
 
 staging_events_copy = f"""
 COPY event_staging FROM '{config.get('S3', 'LOG_DATA')}'
@@ -153,7 +153,7 @@ COMPUPDATE off
 MAXERROR 3;
 """
 
-# INSERT DATA FROM STAGING TO FACT & DIMENSION TABLES
+# INSERT DATA FROM STAGING TO FACT & DIMENSION TABLES ------------------------
 
 user_table_insert = """
 INSERT INTO dim_user (user_id, first_name, last_name, gender, level)
@@ -211,7 +211,7 @@ INSERT INTO fact_songplay (user_id, song_id, artist_id, session_id, start_time)
     WHERE es.page = 'NextSong';
 """
 
-# ANALYTIC QUERIES
+# ANALYTIC QUERIES -----------------------------------------------------------
 
 top_10_artists = """
 SELECT da.name as artist, count(ds.title) as num_plays
@@ -248,7 +248,7 @@ JOIN dim_user du ON (du.user_id = fs.user_id)
 GROUP BY du.gender, fs.level;"""
 
 
-# DIAGNOSTIC QUERY
+# DIAGNOSTIC QUERY -----------------------------------------------------------
 
 count_rows_in_star = """
 SELECT count(*)
@@ -258,7 +258,7 @@ JOIN dim_user   du ON (du.user_id = fs.user_id)
 JOIN dim_artist da ON (da.artist_id = fs.artist_id)
 JOIN dim_time   dt ON (dt.start_time = fs.start_time);"""
 
-# QUERY LISTS
+# QUERY LISTS ----------------------------------------------------------------
 
 create_table_queries = [
     staging_events_table_create,
