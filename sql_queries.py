@@ -185,7 +185,7 @@ INSERT INTO dim_time (
     weekday,
     weekday_str)
     SELECT
-        es.start_time,
+        fsp.start_time,
         extract(hour from es.start_time)      AS hour,
         extract(day from es.start_time)       AS day,
         extract(week from es.start_time)      AS week,
@@ -193,7 +193,7 @@ INSERT INTO dim_time (
         extract(year from es.start_time)      AS year,
         extract(dayofweek from es.start_time) AS weekday,
         to_char(es.start_time, 'Dy')          AS weekday_str
-    FROM event_staging AS es;
+    FROM fact_songplay AS fsp;
 """
 
 songplay_table_insert = """
@@ -285,6 +285,6 @@ insert_table_queries = [
     user_table_insert,
     song_table_insert,
     artist_table_insert,
-    time_table_insert,
     songplay_table_insert,
+    time_table_insert,
 ]
