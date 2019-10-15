@@ -7,8 +7,12 @@ from utils import connect
 
 
 def drop_tables(cur, conn):
-    """Drops all tables from the database"""
-
+    """Drops all tables from the database.
+    
+    Arguments:
+    cur  -- the database cursor object for accessing data
+    conn -- the connection to the database
+    """
     for query in drop_table_queries:
         cur.execute(query)
         conn.commit()
@@ -16,8 +20,13 @@ def drop_tables(cur, conn):
 
 
 def create_tables(cur, conn):
-    """Creates both staging and star-schema tables"""
-
+    """Creates both staging and star-schema tables.
+    
+    
+    Arguments:
+    cur  -- the database cursor object for accessing data
+    conn -- the connection to the database
+    """
     for query in create_table_queries:
         cur.execute(query)
         conn.commit()
@@ -25,7 +34,7 @@ def create_tables(cur, conn):
 
 
 def main():
-    """Drops and re-creates all tables"""
+    """Drops and re-creates all tables."""
     cur, conn = connect()
     drop_tables(cur, conn)
     create_tables(cur, conn)

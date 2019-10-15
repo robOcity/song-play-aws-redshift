@@ -269,6 +269,7 @@ create_table_queries = [
     artist_table_create,
     time_table_create,
 ]
+
 drop_table_queries = [
     staging_events_table_drop,
     staging_songs_table_drop,
@@ -278,6 +279,7 @@ drop_table_queries = [
     artist_table_drop,
     time_table_drop,
 ]
+
 copy_table_queries = [staging_events_copy, staging_songs_copy]
 insert_table_queries = [
     user_table_insert,

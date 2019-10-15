@@ -5,8 +5,12 @@ from utils import connect
 
 
 def load_staging_tables(cur, conn):
-    """Extracts data from JSON files on S3 inserting data into staging tables"""
+    """Extracts data from JSON files and loads into staging tables.
 
+    Arguments:
+    cur  -- the database cursor object for accessing data
+    conn -- the connection to the database
+    """
     for query in copy_table_queries:
         cur.execute(query)
         conn.commit()
@@ -14,7 +18,13 @@ def load_staging_tables(cur, conn):
 
 
 def insert_tables(cur, conn):
-    """Transforms and loads data from staging to star schema tables"""
+    """Transforms and loads data from staging to star schema tables.
+    
+    
+    Arguments:
+    cur  -- the database cursor object for accessing data
+    conn -- the connection to the database
+    """
     for query in insert_table_queries:
         cur.execute(query)
         conn.commit()
@@ -22,7 +32,7 @@ def insert_tables(cur, conn):
 
 
 def get_command():
-    """Enables user to either extract (load) for insert (transform & load) the data"""
+    """Loads new data and updates existing (transform & load) data."""
     cmd = ""
     while cmd not in ["L", "I"]:
         cmd = input("\nL - load\nI - insert\nCommand: ")[0].upper()
@@ -30,7 +40,7 @@ def get_command():
 
 
 def main():
-    """Extracts or transforms and loads the data at the users request"""
+    """Extracts or transforms and loads the data at the users request."""
 
     cmd = get_command()
     if cmd == "L":

@@ -1,18 +1,21 @@
-"""Establish connections to AWS Redshift"""
+"""Establish connections to AWS Redshift."""
 
 import configparser
 import psycopg2
 
 
 def get_config():
-    """Returns a ConfigParser object 
-    allowing programmatic access to configuration parameters"""
+    """Returns a ConfigParser object for access to configuration parameters."""
 
     return configparser.ConfigParser(interpolation=None)
 
 
 def build_connection_str(cfg_file="dwh.cfg"):
-    """Returns the formatted PostgreSQL connection string"""
+    """Returns the formatted PostgreSQL connection string.
+
+    Keyword arguments:
+    cfg_file -- configuration filename (default=dwh.cfg)
+    """
 
     config = get_config()
     config.read(cfg_file, encoding="utf-8")
@@ -28,7 +31,7 @@ def build_connection_str(cfg_file="dwh.cfg"):
 
 
 def connect():
-    """Connects to Redshift cluster using parameter values from configuration file"""
+    """Connects to Redshift cluster using values from configuration file."""
 
     connection_str = build_connection_str()
     print(f"\nConnecting: {connection_str}")
