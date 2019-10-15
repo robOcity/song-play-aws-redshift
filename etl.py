@@ -19,8 +19,7 @@ def load_staging_tables(cur, conn):
 
 def insert_tables(cur, conn):
     """Transforms and loads data from staging to star schema tables.
-    
-    
+
     Arguments:
     cur  -- the database cursor object for accessing data
     conn -- the connection to the database
@@ -41,7 +40,6 @@ def get_command():
 
 def main():
     """Extracts or transforms and loads the data at the users request."""
-
     cmd = get_command()
     if cmd == "L":
         # load data

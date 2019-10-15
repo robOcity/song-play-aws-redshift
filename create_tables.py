@@ -8,7 +8,7 @@ from utils import connect
 
 def drop_tables(cur, conn):
     """Drops all tables from the database.
-    
+
     Arguments:
     cur  -- the database cursor object for accessing data
     conn -- the connection to the database
@@ -21,8 +21,7 @@ def drop_tables(cur, conn):
 
 def create_tables(cur, conn):
     """Creates both staging and star-schema tables.
-    
-    
+
     Arguments:
     cur  -- the database cursor object for accessing data
     conn -- the connection to the database

@@ -6,7 +6,6 @@ import psycopg2
 
 def get_config():
     """Returns a ConfigParser object for access to configuration parameters."""
-
     return configparser.ConfigParser(interpolation=None)
 
 
@@ -32,7 +31,6 @@ def build_connection_str(cfg_file="dwh.cfg"):
 
 def connect():
     """Connects to Redshift cluster using values from configuration file."""
-
     connection_str = build_connection_str()
     print(f"\nConnecting: {connection_str}")
     conn = psycopg2.connect(connection_str)
