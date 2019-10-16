@@ -9,11 +9,11 @@ def get_config():
     return configparser.ConfigParser(interpolation=None)
 
 
-def build_connection_str(cfg_file="dwh.cfg"):
+def build_connection_str(cfg_file=".env/dwh.cfg"):
     """Returns the formatted PostgreSQL connection string.
 
     Keyword arguments:
-    cfg_file -- configuration filename (default=dwh.cfg)
+    cfg_file -- configuration filename (default=.env/dwh.cfg)
     """
 
     config = get_config()

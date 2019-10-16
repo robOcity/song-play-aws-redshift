@@ -33,7 +33,12 @@ The sorting key determines the order of records on each node.  Redshift treats p
 
 ## Running
 
-1. Assumptions:  You have a S3 bucket with data you want to parse and Redshift cluster up and running.  Plus, you have `dwh.cfg` file containing the following fields:
+1. Assumptions:  
+
+* You have a S3 bucket with data you want to parse and Redshift cluster up and running.  
+* You have a security group configured for Redshift allowing for external programmatic access.  See this Quora post for more information ([Can I connect to Redshift using Python?](https://www.quora.com/Can-I-connect-to-Redshift-using-Python)).  
+
+* Plus, you the host, port, user name and password stored in a configuration file.  ** Avoid checking this into GitHub by using a .gitignore file and adding a line like ``.  `dwh.cfg` file containing the following fields:
 
 ```text
 [CLUSTER]
