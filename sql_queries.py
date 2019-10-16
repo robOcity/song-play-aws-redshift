@@ -9,7 +9,7 @@ import configparser
 # CONFIG ---------------------------------------------------------------------
 
 config = configparser.ConfigParser()
-config.read("dwh.cfg")
+config.read(".env/dwh.cfg")
 
 # DROP TABLES ----------------------------------------------------------------
 
@@ -78,7 +78,8 @@ CREATE TABLE IF NOT EXISTS fact_songplay (
     FOREIGN KEY (user_id) REFERENCES dim_user(user_id),
     FOREIGN KEY (song_id) REFERENCES dim_song(song_id),
     FOREIGN KEY (artist_id) REFERENCES dim_artist(artist_id),
-    FOREIGN KEY (start_time) REFERENCES dim_time(start_time),
+    FOREIGN KEY (start_time) REFERENCES dim_time(start_time)
+)
 DISTSTYLE even
 SORTKEY (song_id);
 """
@@ -133,7 +134,8 @@ CREATE TABLE IF NOT EXISTS dim_time (
     weekday int,
     weekday_str varchar(3),
     PRIMARY KEY (start_time)
-)DISTSTYLE even
+)
+DISTSTYLE even
 SORTKEY (start_time);
 """
 
@@ -269,11 +271,11 @@ JOIN dim_time   dt ON (dt.start_time = fs.start_time);"""
 create_table_queries = [
     staging_events_table_create,
     staging_songs_table_create,
-    songplay_table_create,
     user_table_create,
     song_table_create,
     artist_table_create,
     time_table_create,
+    songplay_table_create,
 ]
 
 drop_table_queries = [
