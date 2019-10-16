@@ -33,12 +33,12 @@ The sorting key determines the order of records on each node.  Redshift treats p
 
 ## Running
 
-1. Assumptions:  
+1. Prerequisites:  
 
 * You have a S3 bucket with data you want to parse and Redshift cluster up and running.  
-* You have a security group configured for Redshift allowing for external programmatic access.  See this Quora post for more information ([Can I connect to Redshift using Python?](https://www.quora.com/Can-I-connect-to-Redshift-using-Python)).  
+* You have a security group configured for Redshift allowing for external programmatic access (see [Stackoverflow post](https://stackoverflow.com/questions/19842720/cant-connect-to-redshift-database?rq=1) and [Troubleshooting Connection Issues in Amazon Redshift ](Troubleshooting Connection Issues in Amazon Redshift )).  See this Quora post for more information ([Can I connect to Redshift using Python?](https://www.quora.com/Can-I-connect-to-Redshift-using-Python)).  
 
-* Plus, you the host, port, user name and password stored in a configuration file.  ** Avoid checking this into GitHub by using a .gitignore file and adding a line like ``.  `dwh.cfg` file containing the following fields:
+* Plus, you the host, port, user name and password stored in a configuration file.  Here are the fields your configuration file needs to have.
 
 ```text
 [CLUSTER]
@@ -62,6 +62,8 @@ LOG_DATA=s3://udacity-dend/log-data
 LOG_JSONPATH=s3://udacity-dend/log_json_path.json
 SONG_DATA=s3://udacity-dend/song-data
 ```
+
+* ** Avoid checking your login credentials into GitHub by having Git ignore your configuration file.  To do that you will need to create a `.gitignore` file at the top-level of you repository.  Assuming your configuration file is named `dwh.cfg`, you need to `.cfg`, on a line by itself, to your `.gitignore` file.  Or, create a `.env` folder, add a `.env` line to `.gitignore`, and put your configuration file into it.  I do both.  To easily create a `.gitignore` file checkout [gitignore.io](https://www.gitignore.io/), see examples at [github/gitignore](https://github.com/github/gitignore), or create your own by referring to [gitignore docs](https://git-scm.com/docs/gitignore).**
 
 Okay, this step was a heavy lift, especially the first time!
 
