@@ -71,7 +71,7 @@ SORTKEY (song_id);
 
 songplay_table_create = """
 CREATE TABLE IF NOT EXISTS fact_songplay (
-    user_id text,
+    user_id varchar,
     song_id varchar,
     artist_id varchar,
     start_time timestamp,
@@ -86,7 +86,7 @@ SORTKEY (song_id);
 
 user_table_create = """
 CREATE TABLE IF NOT EXISTS dim_user (
-    user_id text,
+    user_id varchar,
     first_name varchar,
     last_name varchar,
     gender varchar,
@@ -144,7 +144,7 @@ SORTKEY (start_time);
 staging_events_copy = f"""
 COPY event_staging FROM '{config.get('S3', 'LOG_DATA')}'
 IAM_ROLE '{config.get('IAM_ROLE', 'DWH_ROLE_ARN')}'
-JSON 's3://dend-util/events_log_jsonpath.json' truncatecolumns
+JSON 's3://dend-util/data/events_log_jsonpath.json' truncatecolumns
 TIMEFORMAT 'epochmillisecs'
 REGION '{config.get('CLUSTER', 'AWS_REGION')}'
 COMPUPDATE off
@@ -154,7 +154,7 @@ MAXERROR 3;
 staging_songs_copy = f"""
 COPY songplay_staging FROM '{config.get('S3', 'SONG_DATA')}'
 IAM_ROLE '{config.get('IAM_ROLE', 'DWH_ROLE_ARN')}'
-JSON 's3://dend-util/songplay_log_jsonpath.json' truncatecolumns
+JSON 's3://dend-util/data/songplay_log_jsonpath.json' truncatecolumns
 TIMEFORMAT 'epochmillisecs'
 REGION '{config.get('CLUSTER', 'AWS_REGION')}'
 COMPUPDATE off
@@ -212,7 +212,7 @@ INSERT INTO fact_songplay (user_id, song_id, artist_id, session_id, start_time)
         SELECT ds.song_id, ds.title, ds.duration, da.artist_id, da.name
         FROM dim_song   AS ds
         JOIN dim_artist AS da
-      	ON ds.artist_id = da.artist_id) AS saj
+        ON ds.artist_id = da.artist_id) AS saj
     ON (es.song = saj.title
     AND es.artist = saj.name
     AND es.length = saj.duration)
@@ -289,6 +289,7 @@ drop_table_queries = [
 ]
 
 copy_table_queries = [staging_events_copy, staging_songs_copy]
+
 insert_table_queries = [
     user_table_insert,
     song_table_insert,
