@@ -270,10 +270,10 @@ ORDER BY dt.weekday;"""
 
 
 users_by_gender_and_level = """
-SELECT du.gender, fs.level, count(distinct(du.user_id))
+SELECT du.gender, du.level, count(distinct(du.user_id))
 FROM fact_songplay fs
 JOIN dim_user du ON (du.user_id = fs.user_id)
-GROUP BY du.gender, fs.level;"""
+GROUP BY du.gender, du.level;"""
 
 
 # DIAGNOSTIC QUERY -----------------------------------------------------------
