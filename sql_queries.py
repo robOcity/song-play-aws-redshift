@@ -72,6 +72,7 @@ CREATE TABLE IF NOT EXISTS fact_songplay (
     user_id varchar,
     song_id varchar,
     artist_id varchar,
+    session_id varchar,
     start_time timestamp,
     FOREIGN KEY (user_id) REFERENCES dim_user(user_id),
     FOREIGN KEY (song_id) REFERENCES dim_song(song_id),
@@ -201,7 +202,7 @@ INSERT INTO dim_artist (artist_id, name, location, latitude, longitude)
 """
 
 time_table_insert = """
-INSERT INTO temp_time (start_time, hour, day, week, month, year, weekday, weekday_str)
+INSERT INTO dim_time (start_time, hour, day, week, month, year, weekday, weekday_str)
     SELECT
         start_time,
         extract(hour FROM start_time)      AS hour,
@@ -294,6 +295,11 @@ where ranked.artist_id_ranked =1;"""
 
 
 find_tables = "SELECT * FROM PG_TABLE_DEF WHERE schemaname='public';"
+
+check_dim_user = "select count(user_id), count(distinct user_id) from dim_user;"
+check_dim_song = "select count(song_id), count(distinct song_id) from dim_song;"
+check_dim_artist = "select count(artist_id), count(distinct artist_id) from dim_artist;"
+check_dim_time = "select count(start_time), count(distinct start_time) from dim_time;"
 
 find_dup_artist = """
 SELECT artist_id, count(*)
