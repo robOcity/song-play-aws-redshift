@@ -37,13 +37,12 @@ CREATE TABLE IF NOT EXISTS event_staging (
     method varchar,
     page varchar,
     registration varchar,
-    session_id int,
+    session_id varchar,
     song varchar,
     status int,
     start_time timestamp,
     user_agent varchar,
-    user_id varchar,
-    PRIMARY KEY (start_time)
+    user_id varchar
 )
 DISTSTYLE even
 SORTKEY (start_time);
@@ -60,8 +59,7 @@ CREATE TABLE IF NOT EXISTS songplay_staging (
     duration numeric,
     artist_id varchar,
     longitude numeric,
-    location varchar,
-    PRIMARY KEY (song_id)
+    location varchar
 )
 DISTSTYLE even
 SORTKEY (song_id);
@@ -77,8 +75,7 @@ CREATE TABLE IF NOT EXISTS fact_songplay (
     start_time timestamp,
     FOREIGN KEY (user_id) REFERENCES dim_user(user_id),
     FOREIGN KEY (song_id) REFERENCES dim_song(song_id),
-    FOREIGN KEY (artist_id) REFERENCES dim_artist(artist_id),
-    FOREIGN KEY (start_time) REFERENCES dim_time(start_time)
+    FOREIGN KEY (artist_id) REFERENCES dim_artist(artist_id)
 )
 DISTSTYLE even
 SORTKEY (song_id);
@@ -86,12 +83,11 @@ SORTKEY (song_id);
 
 user_table_create = """
 CREATE TABLE IF NOT EXISTS dim_user (
-    user_id varchar,
+    user_id varchar PRIMARY KEY,
     first_name varchar,
     last_name varchar,
     gender varchar,
-    level varchar,
-    PRIMARY KEY (user_id)
+    level varchar
 )
 DISTSTYLE all
 SORTKEY (user_id);
@@ -99,12 +95,11 @@ SORTKEY (user_id);
 
 song_table_create = """
 CREATE TABLE IF NOT EXISTS dim_song (
-    song_id varchar,
+    song_id varchar PRIMARY KEY,
     title varchar NOT NULL,
     artist_id varchar NOT NULL,
     year int,
-    duration numeric,
-    PRIMARY KEY (song_id)
+    duration numeric
 )
 DISTSTYLE all
 SORTKEY (song_id);
@@ -112,12 +107,11 @@ SORTKEY (song_id);
 
 artist_table_create = """
 CREATE TABLE IF NOT EXISTS dim_artist (
-    artist_id varchar,
+    artist_id varchar PRIMARY KEY,
     name varchar NOT NULL,
     location varchar,
     latitude numeric,
-    longitude numeric,
-    PRIMARY KEY (artist_id)
+    longitude numeric
 )
 DISTSTYLE all
 SORTKEY (artist_id);
@@ -125,15 +119,14 @@ SORTKEY (artist_id);
 
 time_table_create = """
 CREATE TABLE IF NOT EXISTS dim_time (
-    start_time timestamp,
+    start_time timestamp NOT NULL,
     hour int,
     day int,
     week int,
     month int,
     year int,
     weekday int,
-    weekday_str varchar(3),
-    PRIMARY KEY (start_time)
+    weekday_str varchar(3)
 )
 DISTSTYLE even
 SORTKEY (start_time);
@@ -163,45 +156,71 @@ MAXERROR 3;
 
 # INSERT DATA FROM STAGING TO FACT & DIMENSION TABLES ------------------------
 
+# TODO deplicate users
 user_table_insert = """
 INSERT INTO dim_user (user_id, first_name, last_name, gender, level)
-    SELECT DISTINCT es.user_id, es.first_name, es.last_name, es.gender, es.level
-    FROM event_staging AS es
-    WHERE es.page = 'NextSong';
+    (SELECT user_id, first_name, last_name, gender, level
+    FROM 
+        (SELECT user_id, first_name, last_name, gender, level, ROW_NUMBER() OVER (
+            PARTITION BY user_id
+            ORDER BY user_id asc, level DESC) AS user_id_ranked
+        FROM event_staging
+        WHERE page = 'NextSong'
+        ORDER BY user_id, level)
+    WHERE user_id_ranked = 1);
 """
 
 song_table_insert = """
 INSERT INTO dim_song (song_id, title, artist_id, year, duration)
-    SELECT DISTINCT sps.song_id, sps.title, sps.artist_id, sps.year, sps.duration
-    FROM songplay_staging AS sps;
+    (SELECT song_id, title, artist_id, year, duration
+    FROM
+        (SELECT song_id, title, artist_id, year, duration, ROW_NUMBER() OVER (
+            PARTITION BY song_id
+            ORDER BY song_id) AS song_id_ranked
+        FROM songplay_staging
+        ORDER BY song_id)
+    WHERE song_id_ranked = 1)
 """
 
 artist_table_insert = """
+INSERT INTO dim_artist (artist_id, name, location, latitude, longitude)
+    (SELECT artist_id, artist_name, location, latitude, longitude
+    FROM
+        (SELECT artist_id, artist_name, location, latitude, longitude, ROW_NUMBER() OVER (
+            PARTITION BY artist_id
+            ORDER BY artist_id) AS artist_id_ranked
+        FROM songplay_staging
+        ORDER BY artist_id)
+    WHERE artist_id_ranked = 1)
+"""
+# TODO remove
+prev_artist_table_insert = """
 INSERT INTO dim_artist (artist_id, name, location, latitude, longitude)
     SELECT DISTINCT sps.artist_id, sps.artist_name, sps.location, sps.longitude, sps.latitude
     FROM songplay_staging AS sps;
 """
 
 time_table_insert = """
-INSERT INTO dim_time (
-    start_time,
-    hour,
-    day,
-    week,
-    month,
-    year,
-    weekday,
-    weekday_str)
+INSERT INTO temp_time (start_time, hour, day, week, month, year, weekday, weekday_str)
     SELECT
-        fsp.start_time,
-        extract(hour from es.start_time)      AS hour,
-        extract(day from es.start_time)       AS day,
-        extract(week from es.start_time)      AS week,
-        extract(month from es.start_time)     AS month,
-        extract(year from es.start_time)      AS year,
-        extract(dayofweek from es.start_time) AS weekday,
-        to_char(es.start_time, 'Dy')          AS weekday_str
-    FROM fact_songplay AS fsp;
+        start_time,
+        extract(hour FROM start_time)      AS hour,
+        extract(day FROM start_time)       AS day,
+        extract(week FROM start_time)      AS week,
+        extract(month FROM start_time)     AS month,
+        extract(year FROM start_time)      AS year,
+        extract(dayofweek FROM start_time) AS weekday,
+        to_char(start_time, 'Dy')          AS weekday_str
+    FROM (
+    	SELECT start_time, user_id, session_id
+    	FROM (
+        	SELECT start_time, user_id, session_id, page, ROW_NUMBER() OVER (
+            	PARTITION BY start_time
+            	ORDER BY user_id, session_id) AS start_time_ranked
+            FROM event_staging
+          	WHERE page = 'NextSong'
+            ORDER BY start_time)
+    	WHERE start_time_ranked = 1)
 """
 
 songplay_table_insert = """
@@ -213,7 +232,7 @@ INSERT INTO fact_songplay (user_id, song_id, artist_id, session_id, start_time)
         FROM dim_song   AS ds
         JOIN dim_artist AS da
         ON ds.artist_id = da.artist_id) AS saj
-    ON (es.song = saj.title
+    ON (es.song   = saj.title
     AND es.artist = saj.name
     AND es.length = saj.duration)
     WHERE es.page = 'NextSong';
@@ -258,6 +277,70 @@ GROUP BY du.gender, fs.level;"""
 
 # DIAGNOSTIC QUERY -----------------------------------------------------------
 
+dedup_artists = """
+SELECT *
+FROM (
+    SELECT
+        artist_id,
+        name,
+        location,
+        ROW_NUMBER() OVER (
+            PARTITION by artist_id
+            ORDER BY name, location) as artist_id_ranked
+    from dim_artist
+    order by artist_id, name, location
+    limit 10) as ranked
+where ranked.artist_id_ranked =1;"""
+
+
+find_tables = "SELECT * FROM PG_TABLE_DEF WHERE schemaname='public';"
+
+find_dup_artist = """
+SELECT artist_id, count(*)
+FROM dim_artist
+GROUP BY artist_id having count(*) > 1;"""
+
+find_dup_song = """
+SELECT song_id, count(*)
+FROM dim_song
+GROUP BY song_id having count(*) > 1;"""
+
+find_dup_start_time = """
+SELECT start_time, count(*)
+FROM dim_time
+GROUP BY start_time having count(*) > 1;
+"""
+
+find_dup_user = """
+SELECT user_id, count(*)
+FROM dim_user
+GROUP BY user_id having count(*) > 1;"""
+
+find_dup_event = """
+SELECT user_id, session_id, start_time, count(*)
+FROM event_staging
+GROUP BY user_id, session_id, song, start_time having count(*) > 1;
+"""
+
+find_specific_dup = """
+SELECT user_id, session_id, song, page, start_time
+FROM event_staging
+WHERE user_id='15'
+order by start_time ;
+
+--(user_id='26' and session_id=431)
+-- (user_id='44' and session_id=269)
+--user_id=15
+"""
+
+find_all_dups = """
+SELECT DISTINCT es.user_id, es.first_name, es.last_name, es.gender, es.level, count(user_id)
+FROM event_staging AS es
+WHERE es.page = 'NextSong'
+GROUP BY es.user_id, es.first_name, es.last_name, es.gender, es.level HAVING count(user_id) > 1
+ORDER BY user_id;
+"""
+
 count_rows_in_star = """
 SELECT count(*)
 FROM fact_songplay fs
@@ -294,6 +377,6 @@ insert_table_queries = [
     user_table_insert,
     song_table_insert,
     artist_table_insert,
-    songplay_table_insert,
     time_table_insert,
+    songplay_table_insert
 ]
