@@ -161,7 +161,7 @@ MAXERROR 3;
 user_table_insert = """
 INSERT INTO dim_user (user_id, first_name, last_name, gender, level)
     (SELECT user_id, first_name, last_name, gender, level
-    FROM 
+    FROM
         (SELECT user_id, first_name, last_name, gender, level, ROW_NUMBER() OVER (
             PARTITION BY user_id
             ORDER BY user_id asc, level DESC) AS user_id_ranked
@@ -194,12 +194,6 @@ INSERT INTO dim_artist (artist_id, name, location, latitude, longitude)
         ORDER BY artist_id)
     WHERE artist_id_ranked = 1)
 """
-# TODO remove
-prev_artist_table_insert = """
-INSERT INTO dim_artist (artist_id, name, location, latitude, longitude)
-    SELECT DISTINCT sps.artist_id, sps.artist_name, sps.location, sps.longitude, sps.latitude
-    FROM songplay_staging AS sps;
-"""
 
 time_table_insert = """
 INSERT INTO dim_time (start_time, hour, day, week, month, year, weekday, weekday_str)
@@ -213,15 +207,15 @@ INSERT INTO dim_time (start_time, hour, day, week, month, year, weekday, weekday
         extract(dayofweek FROM start_time) AS weekday,
         to_char(start_time, 'Dy')          AS weekday_str
     FROM (
-    	SELECT start_time, user_id, session_id
-    	FROM (
-        	SELECT start_time, user_id, session_id, page, ROW_NUMBER() OVER (
-            	PARTITION BY start_time
-            	ORDER BY user_id, session_id) AS start_time_ranked
-            FROM event_staging
-          	WHERE page = 'NextSong'
-            ORDER BY start_time)
-    	WHERE start_time_ranked = 1)
+    SELECT start_time, user_id, session_id
+    FROM (
+        SELECT start_time, user_id, session_id, page, ROW_NUMBER() OVER (
+            PARTITION BY start_time
+            ORDER BY user_id, session_id) AS start_time_ranked
+        FROM event_staging
+        WHERE page = 'NextSong'
+        ORDER BY start_time)
+    WHERE start_time_ranked = 1)
 """
 
 songplay_table_insert = """
@@ -295,11 +289,6 @@ where ranked.artist_id_ranked =1;"""
 
 
 find_tables = "SELECT * FROM PG_TABLE_DEF WHERE schemaname='public';"
-
-check_dim_user = "select count(user_id), count(distinct user_id) from dim_user;"
-check_dim_song = "select count(song_id), count(distinct song_id) from dim_song;"
-check_dim_artist = "select count(artist_id), count(distinct artist_id) from dim_artist;"
-check_dim_time = "select count(start_time), count(distinct start_time) from dim_time;"
 
 find_dup_artist = """
 SELECT artist_id, count(*)
