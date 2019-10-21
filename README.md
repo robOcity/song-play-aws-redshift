@@ -167,41 +167,76 @@ SORTKEY (start_time);
 
 ## Inserting data into fact and dimension tables
 
-Star-schemas are great for analytical workflows.  Here I show you how to transform data from the staging to dimensional tables.
+Star-schemas are ideal for analytical workflows.  Here I show you how to transform data from the staging to dimensional tables.
   
-Inserting data into the song table just required one log file while making sure to prevent duplicate entries.  
+Initially, I used querys that relied on `distinct` to assure that the keys to my dimensional tables were unique.  Atleast, that is what I had thought.  Here is an example of my initial query tranfroming data from a staging to a dimensional table.  
 
 ```sql
-INSERT INTO dim_song (song_id, title, artist_id, year, duration)
-    SELECT DISTINCT sps.song_id, sps.title, sps.artist_id, sps.year, sps.duration
+INSERT INTO dim_artist (artist_id, name, location, latitude, longitude)
+    SELECT DISTINCT sps.artist_id, sps.artist_name, sps.location, sps.longitude, sps.latitude
     FROM songplay_staging AS sps;
 ```
 
-To analyze the popularity of songs over time, for example, by day of the week, I needed to parse the timestamp and used the `extract` function to do it.
+It had worked perfectly running on PostgreSQL, but as I discovered, not so much on AWS Redshift.  Incredulous?  I was too.  While PostgreSQL and Redshift share a SQL interface, Redshift stores the column values in consequtive memory locations, whereas Postgres, like most relational databases, store rows.  For analytics workflows, where typical queries only use some of the columns, columnar access is much more efficient.  [Redshift's documentation](https://docs.aws.amazon.com/redshift/latest/dg/c_best-practices-defining-constraints.html) says that defining primary and foreign keys helps make your queries more efficient **but** it is up to you to enforce the uniquiness of the keys.  So, Redshift assumes your keys are unique once you define a primary or foreign key.  
+
+Once I realized that `distinct` was not working as I expected, I found the following articles that helped my better understand the issue:
+
+* [Amazon Redshift – What you need to think before defining primary key](http://www.sqlhaven.com/amazon-redshift-what-you-need-to-think-before-defining-primary-key/)
+
+* [Redshift PostgreSQL Distinct ON Operator](https://stackoverflow.com/questions/35511803/redshift-postgresql-distinct-on-operator)
+
+* [DISTINCT ON like functionality for Redshift ](https://gist.github.com/jmindek/62c50dd766556b7b16d6)
+
+First, I tried removing all my primary and foreign keys from my tables but I found the problem continued.  
+
+But I was still seeing duplicates in the results to my query.
 
 ```sql
-INSERT INTO dim_time (
-    start_time,
-    hour,
-    day,
-    week,
-    month,
-    year,
-    weekday,
-    weekday_str)
-    SELECT
-        es.start_time,
-        extract(hour from es.start_time)      AS hour,
-        extract(day from es.start_time)       AS day,
-        extract(week from es.start_time)      AS week,
-        extract(month from es.start_time)     AS month,
-        extract(year from es.start_time)      AS year,
-        extract(dayofweek from es.start_time) AS weekday,
-        to_char(es.start_time, 'Dy')          AS weekday_str
-    FROM event_staging AS es;
+SELECT artist_id, count(*)
+FROM dim_artist
+GROUP BY artist_id having count(*) > 1;
 ```
 
-The fact table was the most complex of my insert queries.  Using a subquery (nested select statements) was key to performing this complex query.  
+Then, I tried using a subquery to order the rows containing duplicates and only take the first one.  _This worked!__ Here is how I solved the issue for the artist table.
+
+```sql
+INSERT INTO dim_artist (artist_id, name, location, latitude, longitude)
+    (SELECT artist_id, artist_name, location, latitude, longitude
+    FROM
+        (SELECT artist_id, artist_name, location, latitude, longitude, ROW_NUMBER() OVER (
+            PARTITION BY artist_id
+            ORDER BY artist_id) AS artist_id_ranked
+        FROM songplay_staging
+        ORDER BY artist_id)
+    WHERE artist_id_ranked = 1)
+```
+
+To analyze the popularity of songs over time, for example, by day of the week, I needed to parse the timestamp and used the `extract` function to do it.  Again, I use the `row_number` based suquery to remove duplicate values.  
+
+```sql
+INSERT INTO dim_time (start_time, hour, day, week, month, year, weekday, weekday_str)
+    SELECT
+        start_time,
+        extract(hour FROM start_time)      AS hour,
+        extract(day FROM start_time)       AS day,
+        extract(week FROM start_time)      AS week,
+        extract(month FROM start_time)     AS month,
+        extract(year FROM start_time)      AS year,
+        extract(dayofweek FROM start_time) AS weekday,
+        to_char(start_time, 'Dy')          AS weekday_str
+    FROM (
+    SELECT start_time, user_id, session_id
+    FROM (
+        SELECT start_time, user_id, session_id, page, ROW_NUMBER() OVER (
+            PARTITION BY start_time
+            ORDER BY user_id, session_id) AS start_time_ranked
+        FROM event_staging
+        WHERE page = 'NextSong'
+        ORDER BY start_time)
+    WHERE start_time_ranked = 1)
+```
+
+Inserting data into the fact table relies on only considering songs that were played and matching them using thier title and duration.
 
 ```sql
 INSERT INTO fact_songplay (user_id, song_id, artist_id, session_id, start_time, level, location, user_agent)
