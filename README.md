@@ -2,7 +2,7 @@
 
 How can you build a simple data pipeline on AWS to support your analytical users?  In this repository, I show how using [AWS S3](https://docs.aws.amazon.com/AmazonS3/latest/dev/Introduction.html) for storage, [AWS Redshift](https://docs.aws.amazon.com/redshift/latest/mgmt/welcome.html) to perform ETL and Python to orchestrate it.  First, the data are extracted from JSON log files stored on S3 the SQL using Redshift's `copy` command that creates the staging tables.  Next, SQL `insert` statements transform the data.  Finally, I show you how to use the star-schema for analysis.
 
-![Architecture](images/etl_aws_s3_to_redshift-qs.png)
+![Architecture](images/etl_aws_s3_to_redshift-py.png)
 
 ## Files
 
