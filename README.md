@@ -36,7 +36,7 @@ The sorting key determines the order of records on each node.  Redshift treats p
 1. Prerequisites:  
 
 * You have a S3 bucket with data you want to parse and Redshift cluster up and running.  
-* You have a security group configured for Redshift allowing for external programmatic access (see [Stackoverflow post](https://stackoverflow.com/questions/19842720/cant-connect-to-redshift-database?rq=1) and [Troubleshooting Connection Issues in Amazon Redshift ](Troubleshooting Connection Issues in Amazon Redshift )).  See this Quora post for more information ([Can I connect to Redshift using Python?](https://www.quora.com/Can-I-connect-to-Redshift-using-Python)).  
+* You have a security group configured for Redshift allowing for external programmatic access (see [Stackoverflow: can't connect to redshift database](https://stackoverflow.com/questions/19842720/cant-connect-to-redshift-database?rq=1) and [Amazon: Troubleshooting Connection Issues in Amazon Redshift](https://kb.databricks.com/cloud/redshift-connection-fails.html)).  See this Quora post for more information [Quora: Can I connect to Redshift using Python?](https://www.quora.com/Can-I-connect-to-Redshift-using-Python).  
 
 * Plus, you the host, port, user name and password stored in a configuration file.  Here are the fields your configuration file needs to have.
 
